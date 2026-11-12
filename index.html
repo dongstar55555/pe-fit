@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PE-Fit 만점 대비 맞춤 처방 시스템</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --card-bg: #151c2c;
+      --card-border: #232d42;
+      --input-bg: #0f1523;
+      --accent-blue: #3b82f6;
+      --accent-blue-hover: #2563eb;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-purple: #8b5cf6;
+      --accent-rose: #f43f5e;
+      --text-main: #f1f5f9;
+      --text-sub: #94a3b8;
+      --text-muted: #64748b;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 20px; line-height: 1.5; }
+
+    .container { max-width: 960px; margin: 0 auto; }
+
+    header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; margin-bottom: 24px; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: white; }
+    .logo-text h1 { font-size: 20px; font-weight: 700; color: var(--text-main); }
+    .logo-text p { font-size: 13px; color: var(--text-sub); }
+
+    .nav-tabs { display: flex; background: var(--card-bg); padding: 4px; border-radius: 30px; border: 1px solid var(--card-border); }
+    .tab-btn { background: none; border: none; color: var(--text-sub); padding: 8px 18px; border-radius: 20px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+    .tab-btn.active { background: var(--accent-blue); color: white; }
+
+    .main-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 28px; margin-bottom: 24px; }
+    .hero-banner { background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.08)); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: var(--radius); padding: 24px; margin-bottom: 28px; }
+    .badge { display: inline-block; background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+    .hero-banner h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+    .hero-banner p { font-size: 14px; color: var(--text-sub); }
+
+    .section-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; }
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
+    .form-group.full { grid-column: span 2; }
+    label { display: block; font-size: 13px; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; }
+    
+    .input-wrapper { position: relative; }
+    input, select { width: 100%; background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 12px 14px; border-radius: 8px; font-size: 15px; outline: none; transition: border 0.2s; }
+    input:focus, select:focus { border-color: var(--accent-blue); }
+    .unit { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-muted); }
+
+    .btn-submit { width: 100%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-submit:hover { opacity: 0.95; }
+
+    .result-container { display: none; margin-top: 24px; }
+    .result-container.active { display: block; }
+    .summary-card { background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; display: flex; justify-content: space-around; text-align: center; gap: 12px; }
+    .summary-item .label { font-size: 12px; color: var(--text-sub); }
+    .summary-item .val { font-size: 20px; font-weight: 800; color: #60a5fa; margin-top: 4px; }
+
+    .strategy-box { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; font-size: 14px; color: #a7f3d0; line-height: 1.6; }
+    .strategy-box strong { color: #34d399; font-size: 15px; }
+
+    .phase-card { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; }
+    .phase-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; border-bottom: 1px dashed var(--card-border); padding-bottom: 12px; }
+    .phase-title { font-weight: 700; font-size: 16px; color: #60a5fa; }
+    .phase-period { font-size: 12px; background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 4px; color: var(--text-sub); }
+
+    .exercise-list { list-style: none; }
+    .exercise-item { padding: 13px 0; border-bottom: 1px solid rgba(255,255,255,0.04); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; font-size: 14px; }
+    .exercise-item:last-child { border-bottom: none; }
+    .exercise-item.priority-item { background: rgba(244, 63, 94, 0.07); border: 1px solid rgba(244, 63, 94, 0.25); border-radius: 8px; padding: 14px; margin-bottom: 10px; }
+    
+    .ex-role { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-right: 6px; }
+    .role-priority { background: rgba(244, 63, 94, 0.25); color: #fda4af; }
+    .role-main { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+    .role-sub { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; }
+    .role-transfer { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .role-core { background: rgba(245, 158, 11, 0.2); color: #fde047; }
+    
+    .ex-info { font-weight: 600; color: var(--text-main); font-size: 15px; }
+    .ex-detail { font-size: 13px; color: var(--text-sub); margin-top: 4px; }
+    .ex-alt { font-size: 12px; color: var(--accent-amber); margin-top: 6px; background: rgba(245, 158, 11, 0.08); padding: 4px 8px; border-radius: 4px; display: inline-block; }
+    .ex-dosage { text-align: right; font-weight: 700; color: #e2e8f0; white-space: nowrap; font-size: 13px; background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 6px; }
+
+    .utility-bar { display: flex; gap: 12px; margin-top: 24px; }
+    .btn-secondary { flex: 1; background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .btn-secondary:hover { background: rgba(255,255,255,0.05); }
+
+    .timer-modal { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 16px; margin-top: 16px; text-align: center; }
+    .timer-display { font-size: 36px; font-weight: 800; color: #34d399; margin: 10px 0; }
+    .timer-controls { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .timer-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+    @media (max-width: 640px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: span 1; }
+      header { flex-direction: column; gap: 16px; align-items: flex-start; }
+      .summary-card { flex-direction: column; }
+      .exercise-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .ex-dosage { text-align: left; width: 100%; }
+    }
+
+    @media print {
+      body { background: white; color: black; padding: 0; }
+      .main-card, .hero-banner, .phase-card, .strategy-box { background: white; border: 1px solid #ccc; color: black; }
+      .btn-submit, .nav-tabs, .utility-bar, form { display: none !important; }
+      .result-container { display: block !important; }
+      .summary-item .val, .phase-title { color: #1d4ed8; }
+      .ex-info, .ex-dosage { color: black; }
+      .ex-detail, .ex-alt { color: #333; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo">
+      <div class="logo-icon">MAX</div>
+      <div class="logo-text">
+        <h1>PE-Fit 만점 대비 처방 시스템</h1>
+        <p>개인별 취약점 집중 보완 & 체육 현장 맞춤 트레이닝 프로그램</p>
+      </div>
+    </div>
+    <div class="nav-tabs">
+      <button class="tab-btn active" onclick="switchMode('entrance')">⚡ 체대입시 실기 만점</button>
+      <button class="tab-btn" onclick="switchMode('paps')">❤ PAPS 건강체력</button>
+    </div>
+  </header>
+
+  <div class="main-card">
+    <!-- MODE 1: 체대입시 -->
+    <div id="entrance-mode">
+      <div class="hero-banner">
+        <span class="badge">⚡ 입시 만점 타겟 다이나믹 주기화</span>
+        <h2>종목별 추천 취약점 & 개인별 맞춤 보강 시스템</h2>
+        <p>선택한 실기 종목의 대표 취약점을 자동 추천하며, 학생 개인의 특수한 약점도 직접 선택해 1순위 보강 훈련으로 처방받을 수 있습니다.</p>
+      </div>
+
+      <div class="section-title">🎛 실기 측정치 및 개인별 취약점 입력</div>
+
+      <form id="entrance-form" onsubmit="generateEntrancePrescription(event)" novalidate>
+        <div class="form-grid">
+          <div class="form-group full">
+            <label for="sport-select">실기 종목 선택</label>
+            <select id="sport-select" onchange="updateSportUnit()">
+              <optgroup label="1. 하체 순발력 & 점프 종목">
+                <option value="longjump" data-unit="cm" data-dir="max" data-cat="lower_power" data-p1="235" data-p2="270">제자리멀리뛰기 (cm)</option>
+                <option value="sargent" data-unit="cm" data-dir="max" data-cat="lower_power" data-p1="55" data-p2="70">서전트 점프 / 제자리높이뛰기 (cm)</option>
+              </optgroup>
+              <optgroup label="2. 상체 & 코어 회전 던지기 종목">
+                <option value="medicineball" data-unit="m" data-dir="max" data-cat="upper_power" data-p1="8.5" data-p2="11.0">메디신볼 던지기 (m)</option>
+                <option value="handball" data-unit="m" data-dir="max" data-cat="upper_power" data-p1="28" data-p2="38">핸드볼 공 던지기 (m)</option>
+              </optgroup>
+              <optgroup label="3. 허리·등 최대 근력 종목">
+                <option value="backstrength" data-unit="kg" data-dir="max" data-cat="max_strength" data-p1="145" data-p2="190">배근력 (kg)</option>
+              </optgroup>
+              <optgroup label="4. 민첩성 & 방향전환 달리기 종목">
+                <option value="shuttle10m" data-unit="초" data-dir="min" data-cat="agility" data-p1="9.8" data-p2="8.7">10m 왕복달리기 (초)</option>
+                <option value="shuttle20m" data-unit="초" data-dir="min" data-cat="agility" data-p1="15.5" data-p2="13.8">20m 왕복달리기 (초)</option>
+                <option value="zrun" data-unit="초" data-dir="min" data-cat="agility" data-p1="16.2" data-p2="14.5">Z자 달리기 (초)</option>
+                <option value="crossrun" data-unit="초" data-dir="min" data-cat="agility" data-p1="14.8" data-p2="13.2">십자 달리기 (초)</option>
+                <option value="sidestep" data-unit="회" data-dir="max" data-cat="agility" data-p1="38" data-p2="48">사이드 스텝 (회)</option>
+              </optgroup>
+              <optgroup label="5. 근지구력 & 반복 스피드 종목">
+                <option value="situp" data-unit="회" data-dir="max" data-cat="endurance" data-p1="52" data-p2="70">윗몸 일으키기 / 싯업 (회)</option>
+                <option value="pullup" data-unit="회" data-dir="max" data-cat="endurance" data-p1="8" data-p2="18">턱걸이 / 오래매달리기 (회/초)</option>
+                <option value="pushup" data-unit="회" data-dir="max" data-cat="endurance" data-p1="35" data-p2="55">팔굽혀펴기 (회)</option>
+              </optgroup>
+              <optgroup label="6. 유연성 종목 (앞굽히기 vs 뒤로 젖히기)">
+                <option value="sitandreach" data-unit="cm" data-dir="max" data-cat="flex_front" data-p1="14" data-p2="26">앉아 윗몸 앞굽히기 / 좌전굴 (cm)</option>
+                <option value="backbending" data-unit="cm" data-dir="max" data-cat="flex_back" data-p1="48" data-p2="62">체후굴 / 상체 뒤로 젖히기 (cm)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="curr-record">현재 기록 (숫자 직접 입력)</label>
+            <div class="input-wrapper">
+              <input type="number" id="curr-record" step="0.1" placeholder="숫자 입력 (예: 235)">
+              <span class="unit" id="curr-unit">cm</span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="target-record">목표 기록 (숫자 직접 입력)</label>
+            <div class="input-wrapper">
+              <input type="number" id="target-record" step="0.1" placeholder="숫자 입력 (예: 270)">
+              <span class="unit" id="target-unit">cm</span>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <label for="weakness-select">학생 개인별 집중 보완 취약점 (종목 자동 추천 + 공통 직접 선택)</label>
+            <select id="weakness-select">
+              <optgroup label="⭐ 선택 종목 핵심 추천 취약점" id="recommended-weaknesses"></optgroup>
+              <optgroup label="🔍 기타 공통 피지컬 취약점 (개인별 직접 선택)">
+                <option value="common_flex">전신 유연성 및 관절 가동범위(ROM) 제한</option>
+                <option value="common_core">코어(복부·허리) 고정력 및 신체 밸런스 불안정</option>
+                <option value="common_endurance">전반적인 근지구력 및 후반 체력 저하</option>
+                <option value="common_rehab">관절 피로 누적 및 부상 예방 (저충격 보강 중심)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="prep-period">준비 기간</label>
+            <select id="prep-period">
+              <option value="8">8주 (표준 주기화)</option>
+              <option value="12">12주 (심화 주기화)</option>
+              <option value="4">4주 (파이널 피킹)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="freq">주당 훈련 빈도</label>
+            <select id="freq">
+              <option value="3">주 3회 (권장)</option>
+              <option value="4">주 4회 (고강도)</option>
+              <option value="2">주 2회 (유지)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">🪄 개인 취약점 맞춤 3단계 처방전 생성</button>
+      </form>
+    </div>
+
+    <!-- MODE 2: PAPS -->
+    <div id="paps-mode" style="display: none;">
+      <div class="hero-banner">
+        <span class="badge">❤ PAPS 건강체력 증진 모드</span>
+        <h2>FITT 원리 기반 영역별 맞춤형 건강 처방</h2>
+        <p>학생건강체력평가(PAPS) 5대 영역과 현재 등급에 맞춰 안전하고 점진적인 운동 루틴을 제공합니다.</p>
+      </div>
+
+      <div class="section-title">📊 PAPS 측정 영역 및 등급 입력</div>
+
+      <form id="paps-form" onsubmit="generatePapsPrescription(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="paps-type">체력 측정 영역</label>
+            <select id="paps-type">
+              <option value="cardio">심폐지구력 (왕복오래달리기)</option>
+              <option value="flexibility">유연성 (앉아윗몸앞굽히기)</option>
+              <option value="strength">근력·근지구력 (윗몸말아올리기/악력)</option>
+              <option value="power">순발력 (50m달리기/제멀)</option>
+              <option value="bmi">비만 및 체중 관리 (BMI)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="paps-grade">현재 PAPS 등급</label>
+            <select id="paps-grade">
+              <option value="4">4등급 (저체력 관심군)</option>
+              <option value="5">5등급 (저체력 집중관리군)</option>
+              <option value="3">3등급 (보통 수준)</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">❤ PAPS 맞춤형 FITT 처방전 생성</button>
+      </form>
+    </div>
+
+    <!-- RESULT SECTION -->
+    <div id="result-section" class="result-container">
+      <div class="section-title" style="margin-top:20px;">📋 만점 전략 맞춤 피지컬 처방전</div>
+      
+      <div class="summary-card" id="summary-box"></div>
+      <div class="strategy-box" id="strategy-box"></div>
+      <div id="phase-container"></div>
+
+      <div class="utility-bar">
+        <button class="btn-secondary" onclick="copyPrescription()">📋 처방전 복사</button>
+        <button class="btn-secondary" onclick="window.print()">🖨️ PDF / 인쇄 저장</button>
+        <button class="btn-secondary" onclick="toggleTimer()">⏱ 세트 휴식 타이머</button>
+      </div>
+
+      <div id="timer-box" class="timer-modal" style="display: none;">
+        <div>세트 간 휴식 카운트다운</div>
+        <div class="timer-display" id="timer-val">01:00</div>
+        <div class="timer-controls">
+          <button class="timer-btn" onclick="startTimer(30)">30초</button>
+          <button class="timer-btn" onclick="startTimer(60)">60초</button>
+          <button class="timer-btn" onclick="startTimer(90)">90초</button>
+          <button class="timer-btn" onclick="startTimer(120)">120초</button>
+          <button class="timer-btn" style="background:#ef4444; border:none;" onclick="stopTimer()">정지</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let timerInterval = null;
+
+  // 1. 종목군별 추천 취약점 목록
+  const categoryWeaknesses = {
+    lower_power: [
+      { val: "lp_ankle", text: "발목 탄성 및 지면 반발력 부족 (통통 튀는 힘 미흡)" },
+      { val: "lp_strength", text: "하체 기초 근력 부족 (지면을 강하게 밀어내는 힘 미흡)" },
+      { val: "lp_timing", text: "팔치기 반동과 상·하체 도약 타이밍 불일치" },
+      { val: "lp_landing", text: "착지 밸런스 불안정 및 파울(뒤로 넘어짐) 발생" }
+    ],
+    upper_power: [
+      { val: "up_core", text: "하체-허리-상체 회전 연결(몸통 스냅) 부족" },
+      { val: "up_press", text: "어깨·가슴·팔 밀어내는 기초 근력 부족" },
+      { val: "up_angle", text: "투사 각도(40~45도) 및 손목 마지막 스냅 미흡" },
+      { val: "up_shoulder", text: "어깨 관절 불안정 및 투척 시 통증 우려" }
+    ],
+    max_strength: [
+      { val: "ms_back", text: "허리(척추기립근) 및 엉덩이(둔근) 당기는 힘 부족" },
+      { val: "ms_grip", text: "손잡이 악력 및 전완근 버티기 부족" },
+      { val: "ms_posture", text: "측정 자세(상체 30도) 및 하체-허리 힘 전달 미흡" }
+    ],
+    agility: [
+      { val: "ag_decel", text: "턴 지점 급정거(감속) 및 브레이크 제어 미흡" },
+      { val: "ag_cod", text: "방향 전환 후 첫 발 재가속(스타트) 느림" },
+      { val: "ag_turn", text: "턴 동작 시 중심이 뜨거나 라인·목재 터치 파울 발생" }
+    ],
+    endurance: [
+      { val: "en_base", text: "1회당 주동근 기초 근력 부족 (초반 개수 저조)" },
+      { val: "en_lactic", text: "후반부 근피로(젖산 축적)로 인한 급격한 속도 저하" },
+      { val: "en_speed", text: "초당 반복 스피드 부족 및 반동(자세 파울) 발생" }
+    ],
+    flex_front: [
+      { val: "ff_ham", text: "허벅지 뒤쪽(햄스트링) 및 종아리 뻣뻣함" },
+      { val: "ff_pelvis", text: "골반 접힘 부족 및 허리 위쪽만 굽혀짐" },
+      { val: "ff_breath", text: "마지막 끝지점 호흡 및 버티기(2~3cm 추가) 미흡" }
+    ],
+    flex_back: [
+      { val: "fb_front", text: "고관절 앞쪽(장요근) 및 복부 전면 뻣뻣함" },
+      { val: "fb_thoracic", text: "등(흉추)과 어깨가 뒤로 젖혀지지 않음" },
+      { val: "fb_erector", text: "척추기립근 버티는 힘 부족 및 무릎 굽혀짐" }
+    ]
+  };
+
+  // 2. 선택한 취약점에 따라 각 단계에 1순위로 삽입되는 집중 보강 훈련 데이터베이스
+  const bottleneckDrills = {
+    // 하체 순발력
+    lp_ankle: {
+      p1: { name: "제자리 발목 튕기기 & 종아리 버티기", desc: "무릎을 펴고 발목 탄성만으로 지면 접촉 시간을 최소화하는 기초 훈련", dose: "25회 × 4세트", alt: "대체: 줄넘기 양발 모으기 고속 점프" },
+      p2: { name: "한발 홉 & 연속 리듬 점프 (발목 반발력 집중)", desc: "아킬레스건의 탄성 에너지를 극대화하는 리듬 점프", dose: "좌우 12회 × 4세트", alt: "대체: 낮은 콘(15cm) 연속 넘기" },
+      p3: { name: "박스 드롭 점프 (뎁스 점프, 30cm)", desc: "낙하 후 지면에 닿자마자 0.2초 이내에 용수철처럼 튀어 오르기", dose: "5회 × 4세트", alt: "대체: 연속 허들 점프" }
+    },
+    lp_strength: {
+      p1: { name: "하프 스쿼트 버티기 & 네거티브 스쿼트", desc: "지면을 강하게 밀어내기 위한 하체 기초 근력 및 관절 강성 확보", dose: "30초 버티기 + 8회 × 3세트", alt: "대체: 벽에 등 대고 앉아 버티기(월 싯)" },
+      p2: { name: "고중량 백스쿼트 (또는 불가리안 스플릿 스쿼트)", desc: "대퇴사두근과 엉덩이 근육의 최대 밀어내기 힘(출력) 강화", dose: "6~8회 × 4세트", alt: "대체: 덤벨 점프 스쿼트" },
+      p3: { name: "중량-맨몸 교차 점프 (대비 훈련)", desc: "무거운 스쿼트 직후 맨몸 제자리멀리뛰기를 연결해 신경계 폭발 유도", dose: "스쿼트 3회 + 점프 3회 × 4세트", alt: "대체: 케틀벨 스윙 후 제멀 도약" }
+    },
+    lp_timing: {
+      p1: { name: "제자리 팔치기 스윙 & 무게중심 이동 연습", desc: "무릎 반동과 양팔 스윙의 최하점·최상점 박자를 일치시키는 기본기", dose: "15회 × 3세트", alt: "대체: 거울 보며 팔치기-발목 들기 리듬 연습" },
+      p2: { name: "박스 점프 (팔치기 반동 극대화)", desc: "팔을 뒤에서 앞으로 강하게 뿌려주며 상체 추진력을 도약에 결합", dose: "6회 × 4세트", alt: "대체: 메디신볼 머리 위로 던지며 점프" },
+      p3: { name: "실기 도약 폼 & 공중 무릎 당기기 타이밍 완성", desc: "도약 직후 무릎을 가슴으로 접고 착지 순간 발끝을 앞으로 뻗는 연결 동작", dose: "5회 × 4세트", alt: "대체: 측면 슬로우 모션 영상 피드백 교정" }
+    },
+    lp_landing: {
+      p1: { name: "한발 착지 버티기 (스틱 랜딩)", desc: "점프 착지 시 무릎이 흔들리거나 뒤로 넘어지지 않는 발목·코어 제어", dose: "좌우 8회(2초 정지) × 3세트", alt: "대체: 보수볼/매트 위 한발 균형 잡기" },
+      p2: { name: "복근 행잉 레그레이즈 & 힙 브릿지", desc: "공중에서 다리를 앞으로 뻗을 때 상체가 뒤로 젖혀지지 않는 복근 고정력", dose: "12회 × 4세트", alt: "대체: V-업 복근 운동" },
+      p3: { name: "모래판/매트 착지 무릎 접기 & 팔 앞으로 뻗기", desc: "착지 순간 무게중심을 앞으로 쏠리게 하여 파울을 원천 차단하는 기술", dose: "6회 × 4세트", alt: "대체: 착지 지점 라인 표시 후 정밀 착지" }
+    },
+
+    // 상체 던지기
+    up_core: {
+      p1: { name: "밴드 몸통 비틀기 버티기 & 데드버그", desc: "하체에서 만든 회전 힘이 허리에서 새지 않도록 잡아주는 코어 고정", dose: "좌우 12회 × 3세트", alt: "대체: 사이드 플랭크 버티기" },
+      p2: { name: "밴드/케이블 몸통 회전 당기기 (우드찹)", desc: "복사근의 빠른 몸통 회전력을 키우는 대각선 코어 파워 훈련", dose: "좌우 10회 × 4세트", alt: "대체: 중량 러시안 트위스트" },
+      p3: { name: "메디신볼 한손·양손 허리 회전 던지기", desc: "골반이 먼저 돌아가고 상체가 채찍처럼 따라 나오는 회전 폭발 훈련", dose: "좌우 6회 × 4세트", alt: "대체: 메디신볼 머리 뒤로 넘겨 던지기" }
+    },
+    up_press: {
+      p1: { name: "네거티브 팔굽혀펴기 (3초 천천히 내려가기)", desc: "가슴·어깨·삼두근의 기초 미는 근력 및 팔꿈치 건 강화", dose: "8~10회 × 3세트", alt: "대체: 무릎 대고 팔굽혀펴기" },
+      p2: { name: "스탠딩 오버헤드 프레스 (또는 인클라인 프레스)", desc: "공을 위로 밀어 올리는 어깨와 상체 밀기 최대 근력 강화", dose: "8회 × 4세트", alt: "대체: 덤벨 숄더 프레스" },
+      p3: { name: "점프 팔굽혀펴기 (박스 푸쉬업)", desc: "상체의 미는 힘을 순간적인 폭발 스피드로 전환하는 탄성 훈련", dose: "6회 × 4세트", alt: "대체: 메디신볼 가슴 앞에서 빠르게 밀어 던지기" }
+    },
+    up_angle: {
+      p1: { name: "메디신볼 머리 위 벽 튕기기 (손목 스냅)", desc: "팔꿈치를 펴면서 손끝과 손목 스냅으로 공을 채주는 감각 훈련", dose: "15회 × 3세트", alt: "대체: 밴드 삼두근 아래로 펴기" },
+      p2: { name: "풀오버 크런치 (등·복근 동시 수축)", desc: "활처럼 젖힌 상체를 앞으로 강하게 접어 내리는 투척 윕(Whip) 동작", dose: "12회 × 4세트", alt: "대체: 복근 롤아웃 (무릎 슬라이드)" },
+      p3: { name: "투사 각도(42도) 목표 지점 설정 실기 던지기", desc: "너무 낮거나 높지 않은 최적의 포물선 각도로 공을 방출하는 실전 연습", dose: "6회 × 4세트", alt: "대체: 가벼운 공·무거운 공 번갈아 던지기" }
+    },
+    up_shoulder: {
+      p1: { name: "튜빙 밴드 어깨 외회전/내회전 & 날개뼈 안정화", desc: "던지기 동작 시 어깨 관절을 보호하는 회전근개 보강 훈련", dose: "15회 × 3세트", alt: "대체: 엎드려 Y-T-W 팔 들기" },
+      p2: { name: "덤벨 랜드마인 프레스 (어깨 부담 적은 사선 밀기)", desc: "어깨 통증 없이 투척 각도와 동일한 사선 방향으로 안전하게 출력 향상", dose: "좌우 10회 × 4세트", alt: "대체: 밴드 사선 펀치 밀기" },
+      p3: { name: "충분한 어깨 워밍업 후 단계별 강도(70%→90%→100%) 투척", desc: "갑작스러운 전력 투척으로 인한 어깨 염좌를 막는 실전 컨디셔닝", dose: "단계별 3회 × 3세트", alt: "대체: 투척 후 밴드 쿨다운 당기기" }
+    },
+
+    // 배근력
+    ms_back: {
+      p1: { name: "맨몸 굿모닝 & 힙 브릿지 버티기", desc: "허리가 아닌 엉덩이와 허벅지 뒤쪽으로 당기는 올바른 자세 습득", dose: "12회 × 3세트", alt: "대체: 밴드 힙 힌지 당기기" },
+      p2: { name: "컨벤셔널 데드리프트 (바벨 바닥에서 당기기)", desc: "척추기립근·둔근·하체의 전신 당기기 최대 근력 구축", dose: "5~6회 × 4세트", alt: "대체: 백 익스텐션 (허리 들기)" },
+      p3: { name: "하프 데드리프트 (랙 풀 - 무릎 위 높이)", desc: "배근력 측정 자세와 동일한 상체 각도(30도)에서 초고중량 적응", dose: "4회 × 4세트", alt: "대체: 고정 바벨 5초 전력 당기기" }
+    },
+    ms_grip: {
+      p1: { name: "철봉 오래 매달리기 (데드행)", desc: "배근력 손잡이를 끝까지 놓치지 않는 기본 악력과 전완근 강화", dose: "40초 × 3세트", alt: "대체: 수건 잡고 철봉 매달리기" },
+      p2: { name: "무거운 덤벨/원판 들고 걷기 (파머스 워크)", desc: "전신 긴장감을 유지한 채 손아귀 힘을 극한까지 버티는 훈련", dose: "20m × 4세트", alt: "대체: 원판 두 장 겹쳐 손끝으로 집어 버티기" },
+      p3: { name: "고중량 바벨 홀드 & 그립 세팅 연습", desc: "손바닥 마찰력을 극대화하는 그립 위치 및 손목 고정 훈련", dose: "10초 버티기 × 4세트", alt: "대체: 악력기 최대 강도 5초 버티기" }
+    },
+    ms_posture: {
+      p1: { name: "버드독 & 사이드 플랭크 (허리 안정화 운동)", desc: "고중량 당기기 시 허리가 둥글게 말리지 않도록 척추를 고정하는 훈련", dose: "좌우 8회(10초 정지) × 3세트", alt: "대체: 네발기기 자세 등 평평하게 유지하기" },
+      p2: { name: "바벨 벤트오버 로우 (상체 숙여 당기기)", desc: "상체 30도 각도를 유지한 채 등 근육을 강하게 수축하는 버티기 근력", dose: "8회 × 4세트", alt: "대체: 시티드 케이블 로우" },
+      p3: { name: "하체 펴기-허리 고정 타이밍 맞춤 실기 리허설", desc: "무릎을 펴는 하체 힘과 허리 당기는 힘을 동시에 폭발시키는 협응 훈련", dose: "실전 3회 측정", alt: "대체: 벽에 등 대고 하프 스쿼트 버티기" }
+    },
+
+    // 민첩성
+    ag_decel: {
+      p1: { name: "런지 천천히 내려가기 (3초 감속 훈련)", desc: "전력 질주 후 급정거 시 무릎과 발목에 가해지는 충격을 버티는 브레이크 근력", dose: "좌우 8회 × 3세트", alt: "대체: 사이드 런지 천천히 내려가기" },
+      p2: { name: "스케이트 점프 & 한발 착지 2초 버티기", desc: "턴 동작 시 몸이 바깥으로 밀리지 않고 한 번에 멈추는 제어 훈련", dose: "좌우 8회 × 4세트", alt: "대체: 전방 점프 후 두발 급정거 착지" },
+      p3: { name: "5m 전력 질주 후 급정거·턴 반복 드릴", desc: "최고 속도에서 가장 짧은 제동 거리로 멈춰 서는 실전 감속 훈련", dose: "4회 × 4세트", alt: "대체: 10m 구간 7m 가속 + 3m 급감속 턴" }
+    },
+    ag_cod: {
+      p1: { name: "사다리(래더) 빠른 스텝 & 라인 밟기 드릴", desc: "발이 지면에 닿는 시간을 줄이고 잔발 전환 속도를 높이는 기초 훈련", dose: "20초 × 4세트", alt: "대체: 제자리 빠른 발 구르기" },
+      p2: { name: "사이드 런지 폭발적 밀어내기 & 런지 점프", desc: "턴 지점에서 지면을 강하게 차고 반대 방향으로 튕겨 나가는 추진력", dose: "좌우 8회 × 4세트", alt: "대체: 밴드 허리에 걸고 측면 치고 나가기" },
+      p3: { name: "크로스 스텝 첫 발 가속 & 5m 스타트 스프린트", desc: "방향을 바꾼 직후 첫 발을 멀리 내딛어 최고 속도에 빠르게 도달하는 훈련", dose: "5m × 5세트", alt: "대체: 신호 반응 3m 폭발 스타트" }
+    },
+    ag_turn: {
+      p1: { name: "무게중심 낮추기 사이드 스텝 (낮은 자세 유지)", desc: "턴 동작 시 상체가 들리지 않고 낮은 중심을 유지하는 하체 지구력", dose: "20초 × 4세트", alt: "대체: 낮은 자세 코너 돌기 스텝" },
+      p2: { name: "코펜하겐 플랭크 (사이드 플랭크 다리 들기)", desc: "급격한 방향 전환 시 사타구니(내전근) 부상을 막고 다리를 빠르게 모으는 힘", dose: "좌우 25초 × 3세트", alt: "대체: 옆으로 누워 안쪽 다리 들기" },
+      p3: { name: "실기 규격 목재/라인 터치 턴 정밀 반복", desc: "파울 없이 손터치·발터치를 가장 짧은 동선으로 수행하는 기술 훈련", dose: "왕복 3회 × 4세트", alt: "대체: 콘 3개 지그재그 최단 코너링" }
+    },
+
+    // 근지구력
+    en_base: {
+      p1: { name: "네거티브 수축 훈련 (3초 버티며 천천히 내려오기)", desc: "1회 수행 근력을 빠르게 끌어올리는 가장 효과적인 기초 근력 훈련", dose: "6~8회 × 4세트", alt: "대체: 밴드 보조 정자세 반복" },
+      p2: { name: "정자세 데드스톱 반복 (반동 없이 1회씩 끊어 하기)", desc: "치팅 없이 주동근의 순수 근력만으로 가동범위를 채우는 훈련", dose: "10~12회 × 4세트", alt: "대체: 피라미드 세트 (3-5-7-5-3회)" },
+      p3: { name: "초반 20초 최대 개수 스퍼트 훈련", desc: "체력이 남아있는 초반 20초 동안 최대한 많은 개수를 확보하는 전략 훈련", dose: "20초 전력 × 4세트", alt: "대체: 휴식 60초 두고 15회씩 끊어 치기" }
+    },
+    en_lactic: {
+      p1: { name: "불완전 휴식 반복 훈련 (휴식 30초 제한)", desc: "근육 피로가 완전히 풀리기 전에 다음 세트를 시작해 회복력을 높이는 훈련", dose: "12회 × 5세트 (휴식 30초)", alt: "대체: 40초 수행 + 20초 휴식 반복" },
+      p2: { name: "EMOM 훈련 (매분 정해진 목표 개수 채우기)", desc: "1분마다 목표 개수를 수행하고 남은 시간만 휴식하는 근지구력 훈련", dose: "10분 연속 진행", alt: "대체: 타바타 (20초 운동 / 10초 휴식 × 8회)" },
+      p3: { name: "근피로 상태 한계 돌파 드롭 세트 (자세 낮춰 끝까지 이어가기)", desc: "정자세가 안 나올 때 즉시 쉬운 자세로 바꿔 끝까지 근육을 짜내는 훈련", dose: "최대 반복 × 3세트", alt: "대체: 실기 동일 1분 타임어택 모의 테스트" }
+    },
+    en_speed: {
+      p1: { name: "주동근 단축 가동범위 고속 펌핑", desc: "신경계 수축 속도를 높여 동작 전환을 빠르게 만드는 스피드 훈련", dose: "15초 고속 × 4세트", alt: "대체: 메트로놈 박자(빠른 템포) 맞춤 반복" },
+      p2: { name: "실기 동작 1.5배속 가속 반복", desc: "내려갈 때 중력을 이용해 빠르게 떨어지고 반사적으로 올라오는 탄성 반복", dose: "15~20회 × 4세트", alt: "대체: 밴드 탄성 보조 고속 반복" },
+      p3: { name: "호흡 리듬 동기화 (수축 시 짧고 강하게 내뱉기)", desc: "빠른 반복 중 호흡이 꼬여 조기 탈진하거나 파울이 나는 것을 막는 기술", dose: "30초 × 4세트", alt: "대체: 센서 인식 높이·각도 정밀 체크" }
+    },
+
+    // 전면 유연성
+    ff_ham: {
+      p1: { name: "폼롤러 허벅지 뒤(햄스트링)·종아리 근막 이완", desc: "굳어있는 근육과 근막을 풀어 스트레칭 효과를 2배로 높이는 사전 준비", dose: "부위별 90초 (총 10분)", alt: "대체: 마사지볼로 발바닥·종아리 풀기" },
+      p2: { name: "수건/밴드 이용 PNF 저항 스트레칭", desc: "10초 늘리기 → 6초 뒤꿈치로 밀기 → 15초 더 깊이 늘리기 반복", dose: "좌우 4회 × 3세트", alt: "대체: 파트너 보조 햄스트링 스트레칭" },
+      p3: { name: "코끼리 걸음 (상체 숙여 무릎 교대로 펴기)", desc: "좌골신경과 허벅지 뒤쪽의 팽팽한 당김을 해소하는 동적 신장 훈련", dose: "좌우 15회 × 3세트", alt: "대체: 벽에 발 대고 종아리·오금 늘리기" }
+    },
+    ff_pelvis: {
+      p1: { name: "고양이-소 자세 & 앉아서 골반 앞뒤 기울이기", desc: "등만 둥글게 말지 않고 골반(고관절) 자체를 앞으로 접는 힙 힌지 감각", dose: "12회 × 3세트", alt: "대체: 의자에 앉아 허리 펴고 상체 앞으로 숙이기" },
+      p2: { name: "척추 마디 숙이기 (제퍼슨 컬)", desc: "목부터 등, 허리, 햄스트링까지 후면 전체를 한 마디씩 길게 늘리는 훈련", dose: "6회(하단 5초 정지) × 3세트", alt: "대체: 다리 벌리고 앉아 상체 앞으로 숙이기" },
+      p3: { name: "앉아서 다리 펴고 복근 힘으로 상체 당기기", desc: "손으로 억지로 당기지 않고 배와 고관절 힘으로 상체를 허벅지에 붙이기", dose: "10초 버티기 × 5세트", alt: "대체: 누워서 다리 수직으로 들어올리기" }
+    },
+    ff_breath: {
+      p1: { name: "복식호흡 횡격막 이완 연습", desc: "숨을 길게 내쉴 때 상체 긴장이 풀리며 자연스럽게 앞으로 숙여지는 호흡법", dose: "10회 호흡 × 3세트", alt: "대체: 무릎 꿇고 엎드려 아기 자세 호흡" },
+      p2: { name: "날개뼈 앞으로 뽑아 팔 뻗기 드릴", desc: "등 날개뼈를 앞으로 밀어내어 손끝 도달 거리를 1~2cm 더 늘리는 기술", dose: "10회 × 3세트", alt: "대체: 벽 앞에서 손끝 최대한 앞으로 밀기" },
+      p3: { name: "좌전굴 측정판 5초 날숨 밀기 실전 리허설", desc: "숨을 최대로 뱉으면서 한계 지점에서 5초간 흔들림 없이 정지하는 훈련", dose: "5초 정지 × 8회", alt: "대체: 측정 직전 5분 동적 워밍업 루틴" }
+    },
+
+    // 후면 유연성
+    fb_front: {
+      p1: { name: "런지 자세 고관절 앞쪽(장요근) 깊은 스트레칭", desc: "골반 앞쪽이 뻣뻣해 허리만 꺾이는 현상을 막고 통증을 예방하는 필수 이완", dose: "좌우 30초 × 4세트", alt: "대체: 소파/벤치에 뒷발 올리고 골반 늘리기" },
+      p2: { name: "스핑크스 & 코브라 자세 (복부 전면 늘리기)", desc: "골반을 바닥에 붙인 채 복직근과 가슴 앞쪽 길이를 점진적으로 확장", dose: "20초 유지 × 4세트", alt: "대체: 짐볼 위에 등 대고 뒤로 젖히기" },
+      p3: { name: "낙타 자세 (골반 앞으로 밀며 상체 후굴)", desc: "엉덩이 근육을 조여 골반을 앞으로 밀어주면서 안전하게 허리 아치 만들기", dose: "15초 유지 × 4세트", alt: "대체: 힙 브릿지 상태에서 가슴 들어올리기" }
+    },
+    fb_thoracic: {
+      p1: { name: "폼롤러 등(흉추) 대고 뒤로 젖히기", desc: "허리(요추)가 아닌 등 위쪽(흉추)이 부드럽게 젖혀지도록 가동범위 확보", dose: "10회(3초 정지) × 3세트", alt: "대체: 벤치에 팔꿈치 대고 등 아래로 누르기" },
+      p2: { name: "벽에 등 대고 팔 올리기 (월 엔젤) & 어깨 회전", desc: "만세 자세에서 팔과 어깨가 뒤로 충분히 넘어가도록 흉추·어깨 개방", dose: "10회 × 3세트", alt: "대체: 수건/밴드 잡고 머리 뒤로 팔 넘기기" },
+      p3: { name: "시선 천장·바닥 유도 및 가슴 들어올리기 드릴", desc: "고개와 시선을 뒤로 보내며 등 상부 아치를 2~3cm 더 끌어올리는 실전 기술", dose: "6회 × 3세트", alt: "대체: 거울/영상으로 측면 아치 각도 체크" }
+    },
+    fb_erector: {
+      p1: { name: "버드독 & 교대 팔다리 들기 (스위머)", desc: "척추를 안정적으로 지지하면서 등 전체 기립근을 깨우는 기초 근력", dose: "좌우 10회 × 3세트", alt: "대체: 네발기기 자세 팔·다리 뻗기" },
+      p2: { name: "엎드려 상체 들기 (슈퍼맨 3초 버티기)", desc: "수동 스트레칭을 넘어 스스로 상체를 뒤로 끌어올리는 척추기립근 근력", dose: "8회(3초 정지) × 4세트", alt: "대체: 백 익스텐션 기구 상체 들기" },
+      p3: { name: "척추기립근 전력 수축 실기 후굴 5초 버티기", desc: "발목 고정 상태에서 무릎을 펴고 최고점에서 5초간 흔들림 없이 버티기", dose: "5초 정지 × 6회", alt: "대체: 측정기 동일 폼 2회 연속 리허설" }
+    },
+
+    // 공통 피지컬 취약점 (개인별 직접 선택용)
+    common_flex: {
+      p1: { name: "전신 폼롤러 근막 이완 & 고관절·흉추 가동성 스트레칭", desc: "종목 수행 시 동작 크기를 제한하는 뻣뻣한 관절 가동범위(ROM) 우선 확보", dose: "부위별 60초 (총 10분)", alt: "대체: 동적 관절 돌리기 & 런지 트위스트" },
+      p2: { name: "최대 가동범위(Full ROM) 컨트롤 근력 훈련", desc: "관절을 끝까지 굽히고 펴는 전체 구간에서 힘을 쓰는 유연성-근력 결합 훈련", dose: "10회 × 3세트", alt: "대체: 척추 마디 숙이기 & 월 엔젤" },
+      p3: { name: "실기 종목 최대 동작 크기 적용 폼 리허설", desc: "확보된 관절 가동범위를 실제 기록 향상(보폭·투사각·회전반경)으로 연결", dose: "5회 × 3세트", alt: "대체: 훈련 전후 관절 가동범위 체크" }
+    },
+    common_core: {
+      p1: { name: "배꼽 당기기(할로우 홀드) & 버드독 코어 안정화", desc: "팔다리가 강하게 움직일 때 몸통 중심이 흔들리지 않도록 잡아주는 핵심 코어", dose: "35초 × 3세트", alt: "대체: 데드버그 & 기본 플랭크" },
+      p2: { name: "사이드 플랭크 & 밴드 몸통 비틀기 버티기", desc: "좌우 비대칭과 회전력 누수를 막아 하체 힘을 상체로 100% 전달하는 훈련", dose: "좌우 30초 × 3세트", alt: "대체: 한손 무거운 덤벨 들고 서서 버티기" },
+      p3: { name: "실기 동작 수행 중 복압(배 힘) 유지 집중 훈련", desc: "도약·투척·방향전환 순간 코어에 힘을 주어 파워 손실을 제로로 만드는 연습", dose: "5회 × 4세트", alt: "대체: V-업 & 행잉 레그레이즈" }
+    },
+    common_endurance: {
+      p1: { name: "인터벌 유산소 및 서킷 기초 체력 훈련", desc: "실기 시험 당일 여러 종목을 연속으로 치러도 지치지 않는 심폐·근지구력 기반", dose: "20분 서킷 (40초 운동/20초 휴식)", alt: "대체: 2분 조깅 + 1분 빠른 달리기 6회" },
+      p2: { name: "세트 간 휴식 단축(45초) 고반복 지구력 훈련", desc: "짧은 휴식만으로도 다음 세트 출력을 유지할 수 있는 근피로 회복력 강화", dose: "15회 × 4세트 (휴식 45초)", alt: "대체: EMOM(매분 정해진 횟수 수행) 10분" },
+      p3: { name: "실전 시험 스케줄 동일 연속 측정 시뮬레이션", desc: "예비 측정부터 본 측정까지 체력 안배와 집중력을 끝까지 유지하는 리허설", dose: "실전 3회 연속 측정", alt: "대체: 후반 체력 저하 구간 페이스 조절 연습" }
+    },
+    common_rehab: {
+      p1: { name: "관절 충격 없는 버티기(등척성) & 주변부 보강 훈련", desc: "무릎·발목·허리·어깨에 통증이나 피로가 있을 때 안전하게 근력을 유지하는 훈련", dose: "30~40초 버티기 × 3세트", alt: "대체: 통증 없는 범위 내 천천히 움직이기" },
+      p2: { name: "네거티브(천천히 내려가기) 관절 제어 근력", desc: "반동과 점프 충격을 줄이고 근육의 제어력만으로 안전하게 부하를 주는 훈련", dose: "8~10회 × 3세트", alt: "대체: 밴드 저항 활용 저충격 근력 운동" },
+      p3: { name: "철저한 웜업·쿨다운 병행 컨디셔닝 실기 점검", desc: "무리한 반복 횟수를 줄이고 최상의 컨디션으로 1~2회 최고 기록만 뽑아내는 전략", dose: "실전 2회 집중 측정", alt: "대체: 훈련 후 아이싱 및 폼롤러 이완" }
+    }
+  };
+
+  // 3. 6대 생체역학 카테고리별 표준 루틴 (체육계 통상 용어 적용)
+  const expandedEntranceDB = {
+    lower_power: {
+      p1: {
+        title: "1단계: 힘줄·관절 적응 및 하체 자세 기초",
+        meta: "여유 횟수 3개(RIR 3) / 부상 예방기",
+        items: [
+          { role: "주동근", cls: "role-main", name: "카프레이즈(뒤꿈치 들기) & 하프 스쿼트 버티기", desc: "아킬레스건과 무릎 힘줄의 탄성 및 버티는 힘 구축", dose: "45초 버티기 × 4세트", alt: "대체: 한발 서서 발목 버티기" },
+          { role: "보조근", cls: "role-sub", name: "네거티브 스쿼트 (3초간 천천히 내려가기)", desc: "하체 착지 제어력 및 엉덩이 뒤로 빼기(힙 힌지) 자세 숙달", dose: "10회 × 3세트", alt: "대체: 덤벨 가슴 앞에 들고 스쿼트(고블렛)" },
+          { role: "실기전이", cls: "role-transfer", name: "제자리 발목 점프 (줄넘기 리듬 점프)", desc: "무릎을 펴고 발목 탄성만으로 지면 접촉 시간을 줄이는 훈련", dose: "20회 × 4세트", alt: "대체: 선 넘기 좌우·전후 발목 점프" },
+          { role: "코어", cls: "role-core", name: "배꼽 당기기(할로우 홀드) & 힙 브릿지", desc: "도약과 착지 시 허리가 꺾이지 않도록 잡아주는 몸통 고정력", dose: "40초 × 3세트", alt: "대체: 기본 플랭크 버티기" }
+        ]
+      },
+      p2: {
+        title: "2단계: 하체 최대 근력 및 도약 추진력 강화",
+        meta: "여유 횟수 2개(RIR 2) / 중량·점프 과부하",
+        items: [
+          { role: "주동근", cls: "role-main", name: "백스쿼트 (또는 불가리안 스플릿 스쿼트)", desc: "허벅지와 엉덩이 근육의 최대 밀어내기 출력 극대화", dose: "6~8회 × 4세트", alt: "대체: 트랩바 데드리프트" },
+          { role: "보조근", cls: "role-sub", name: "루마니안 데드리프트", desc: "앞으로 멀리 뻗어 나가는 추진력을 만드는 허벅지 뒤·둔근 강화", dose: "8회 × 3세트", alt: "대체: 케틀벨 힙 스러스트" },
+          { role: "실기전이", cls: "role-transfer", name: "박스 점프 (착지 충격 최소화)", desc: "고관절·무릎·발목을 동시에 폭발적으로 펴며 높은 곳으로 도약", dose: "6회 × 4세트", alt: "대체: 메디신볼 들고 점프 스쿼트" },
+          { role: "코어", cls: "role-core", name: "행잉 레그레이즈 (매달려 다리 들기) / V-업", desc: "공중에서 무릎을 가슴 쪽으로 빠르게 끌어당기는 복근 힘", dose: "12회 × 3세트", alt: "대체: 누워서 다리 들어올리기" }
+        ]
+      },
+      p3: {
+        title: "3단계: 순간 폭발력 및 실기 도약 피킹",
+        meta: "100% 최대 속도 수행 / 완전 휴식",
+        items: [
+          { role: "주동근", cls: "role-main", name: "박스 드롭 점프 (뎁스 점프, 30~40cm)", desc: "박스에서 내리자마자 지면 접촉 0.2초 이내 반사적 재도약", dose: "5회 × 4세트", alt: "대체: 연속 허들 넘기 점프" },
+          { role: "보조근", cls: "role-sub", name: "한발 뛰기(홉) & 두발 연속 바운딩", desc: "수직 점프 힘을 수평 비거리로 전환하는 탄성 보폭 훈련", dose: "15m × 3세트", alt: "대체: 3단 연속 제자리멀리뛰기" },
+          { role: "실기전이", cls: "role-transfer", name: "탄력 밴드 점프 (오버스피드 점프)", desc: "밴드의 탄성 도움을 받아 평소보다 빠른 속도로 도약하는 신경계 훈련", dose: "4회 × 4세트", alt: "대체: 가벼운 무게 들고 점프 스쿼트" },
+          { role: "실기폼", cls: "role-core", name: "팔치기 타이밍 맞춤 실기 폼 리허설", desc: "상체 팔 반동과 하체 도약 타이밍을 100% 일치시키는 실전 연습", dose: "5회 × 3세트", alt: "대체: 측면 영상 촬영 후 공중·착지 자세 교정" }
+        ]
+      }
+    },
+
+    upper_power: {
+      p1: {
+        title: "1단계: 어깨 관절 안정화 및 몸통 회전 기초",
+        meta: "여유 횟수 3개(RIR 3) / 어깨·허리 보호기",
+        items: [
+          { role: "주동근", cls: "role-main", name: "튜빙 밴드 어깨 회전 & 날개뼈 안정화 운동", desc: "공을 던진 후 팔을 멈춰주는 회전근개 강화 및 어깨 부상 예방", dose: "15회 × 3세트", alt: "대체: 가벼운 덤벨 옆으로 누워 팔 회전" },
+          { role: "보조근", cls: "role-sub", name: "네거티브 팔굽혀펴기 (3초간 천천히 내려가기)", desc: "가슴·삼두근의 기초 근력 구축 및 팔꿈치 힘줄 보호", dose: "8~10회 × 3세트", alt: "대체: 벤치에 손 짚고 팔굽혀펴기" },
+          { role: "실기전이", cls: "role-transfer", name: "메디신볼 머리 위 벽 튕기기 (손목 스냅)", desc: "손목과 손끝의 빠른 탄성으로 공을 튕겨내는 감각 형성", dose: "15회 × 3세트", alt: "대체: 밴드 아래로 당겨 팔 펴기" },
+          { role: "코어", cls: "role-core", name: "밴드 몸통 비틀기 버티기 & 데드버그", desc: "하체에서 올라오는 회전 에너지가 허리에서 새지 않도록 고정", dose: "좌우 10회 × 3세트", alt: "대체: 사이드 플랭크 버티기" }
+        ]
+      },
+      p2: {
+        title: "2단계: 상체 미는 근력 및 몸통 회전 파워 강화",
+        meta: "여유 횟수 2개(RIR 2) / 협응 근력 과부하",
+        items: [
+          { role: "주동근", cls: "role-main", name: "스탠딩 오버헤드 프레스 (또는 인클라인 프레스)", desc: "투사 각도(40~45도)에 맞춘 상체 밀어내기 최대 출력 향상", dose: "8회 × 4세트", alt: "대체: 바벨 한쪽 끝 잡고 사선으로 밀기" },
+          { role: "보조근", cls: "role-sub", name: "밴드/케이블 몸통 회전 당기기 (우드찹)", desc: "옆구리(복사근)의 빠른 몸통 회전력을 키우는 코어 훈련", dose: "좌우 10회 × 3세트", alt: "대체: 원판 들고 러시안 트위스트" },
+          { role: "실기전이", cls: "role-transfer", name: "점프 팔굽혀펴기 (박스 푸쉬업)", desc: "상체 근력을 순간적인 탄성 반발력으로 전환하는 폭발 훈련", dose: "6회 × 4세트", alt: "대체: 벽 밀기 폭발 팔굽혀펴기" },
+          { role: "코어", cls: "role-core", name: "풀오버 크런치 (등·복근 동시 당기기)", desc: "활처럼 젖힌 상체를 앞으로 강하게 접어 내리는 투척 동작 강화", dose: "12회 × 3세트", alt: "대체: 복근 롤아웃 (무릎 대고 밀기)" }
+        ]
+      },
+      p3: {
+        title: "3단계: 전신 연결 폭발력 및 실기 투사 스피드",
+        meta: "100% 최대 가속 방출 / 완전 휴식",
+        items: [
+          { role: "주동근", cls: "role-main", name: "메디신볼 머리 뒤로 넘겨 던지기 & 바닥 내리찍기", desc: "발바닥-고관절-코어-손끝까지 온몸의 힘을 하나로 연결해 폭발", dose: "5회 × 4세트", alt: "대체: 무릎 꿇고 메디신볼 가슴 앞에서 밀어 던지기" },
+          { role: "보조근", cls: "role-sub", name: "한손 허리 회전 던지기 (메디신볼/중량볼)", desc: "골반 선행 회전 후 상체가 채찍처럼 따라 나오는 회전 폭발", dose: "좌우 5회 × 4세트", alt: "대체: 밴드 잡고 고속 회전 펀치" },
+          { role: "실기전이", cls: "role-transfer", name: "무거운 공 · 실기 공인구 번갈아 던지기", desc: "무거운 공 직후 가벼운 실기 공을 던져 팔 휘두르는 속도를 극대화", dose: "4회 × 4세트", alt: "대체: 실기 공인구 100% 스피드 릴리즈" },
+          { role: "실기폼", cls: "role-core", name: "파울라인 정지 릴리즈 각도 특화 연습", desc: "발 이격 제한 규정 내에서 최적 비거리 각도(42도) 완성", dose: "5회 × 3세트", alt: "대체: 목표 높이 줄/테이프 설치 후 넘기기" }
+        ]
+      }
+    },
+
+    max_strength: {
+      p1: {
+        title: "1단계: 허리 중립 안정화 및 올바른 당기기 자세",
+        meta: "여유 횟수 3개(RIR 3) / 허리 부상 예방기",
+        items: [
+          { role: "주동근", cls: "role-main", name: "맨몸 굿모닝 & 힙 브릿지 버티기", desc: "허리가 둥글게 말리지 않고 엉덩이·허벅지 뒤로 당기는 기본 자세", dose: "12회 × 3세트", alt: "대체: 밴드 다리 사이로 당겨 엉덩이 조이기" },
+          { role: "보조근", cls: "role-sub", name: "인버티드 로우 (낮은 철봉 매달려 당기기)", desc: "날개뼈를 모으고 등 근육(광배근)을 쓰는 기초 상체 당기기", dose: "10회 × 3세트", alt: "대체: 덤벨 한손 로우" },
+          { role: "실기전이", cls: "role-transfer", name: "철봉 오래 매달리기 (데드행)", desc: "배근력 손잡이를 끝까지 놓치지 않는 악력과 전완근 버티기", dose: "40초 × 3세트", alt: "대체: 원판 손끝으로 집어 버티기" },
+          { role: "코어", cls: "role-core", name: "버드독 · 사이드 플랭크 · 윗몸 말아올리기", desc: "고중량 당기기 전 척추를 단단히 받쳐주는 3대 허리 보호 운동", dose: "좌우 8회(10초 정지) × 3세트", alt: "대체: 데드버그 코어 버티기" }
+        ]
+      },
+      p2: {
+        title: "2단계: 등·하체 후면 사슬 최대 근력 강화",
+        meta: "여유 횟수 1~2개 / 점진적 중량 증대",
+        items: [
+          { role: "주동근", cls: "role-main", name: "컨벤셔널 데드리프트 (바벨 바닥에서 당기기)", desc: "척추기립근·둔근·하체의 전신 당기기 최대 근력 구축", dose: "5~6회 × 4세트", alt: "대체: 트랩바 데드리프트" },
+          { role: "보조근", cls: "role-sub", name: "바벨 벤트오버 로우 (상체 숙여 바벨 당기기)", desc: "상체를 숙인 상태에서 등 근육이 버티는 힘 강화", dose: "8회 × 4세트", alt: "대체: 앉아서 케이블 당기기(시티드 로우)" },
+          { role: "실기전이", cls: "role-transfer", name: "백 익스텐션 (허리 들기 운동)", desc: "척추기립근의 국소 근력 및 피로 저항성 증대", dose: "12회 × 3세트", alt: "대체: 엎드려 상·하체 동시에 들기" },
+          { role: "코어", cls: "role-core", name: "고중량 파머스 워크 (무거운 중량 들고 걷기)", desc: "악력 풀림 방지 및 몸통 전체 강성 극대화", dose: "20m × 3세트", alt: "대체: 무거운 바벨 들고 10초 버티기" }
+        ]
+      },
+      p3: {
+        title: "3단계: 측정 각도(30도) 최대 출력 피킹",
+        meta: "신경계 최대 동원 / 세트 간 충분한 휴식",
+        items: [
+          { role: "주동근", cls: "role-main", name: "하프 데드리프트 (랙 풀 - 무릎 위 30도 각도)", desc: "배근력 측정 자세와 동일한 관절 각도에서 초고중량 적응", dose: "3~4회 × 4세트", alt: "대체: 블록 위에 바벨 올리고 당기기" },
+          { role: "보조근", cls: "role-sub", name: "고정 바벨 5초 전력 당기기 (등척성 버티기)", desc: "움직임 없이 5초간 온몸의 힘을 100% 폭발시키는 훈련", dose: "5초 전력 × 4세트", alt: "대체: 스트랩/밴드 고정 후 전력 당기기" },
+          { role: "실기전이", cls: "role-transfer", name: "하체 펴기-허리 고정 협응 연습", desc: "무릎을 펴는 하체 힘과 허리 각도 유지를 정확히 일치시키는 훈련", dose: "5회 × 3세트", alt: "대체: 벽에 등 대고 하프 스쿼트 버티기" },
+          { role: "실기폼", cls: "role-core", name: "실기 배근력계 그립 및 체인 길이 세팅 연습", desc: "손바닥 미끄럼 방지 및 본인 키에 맞는 최적 체인 길이 숙달", dose: "실전 2회 측정", alt: "대체: 당기기 직전 복압(배 힘) 호흡 연습" }
+        ]
+      }
+    },
+
+    agility: {
+      p1: {
+        title: "1단계: 급정거 감속 근력 및 발목·무릎 제어",
+        meta: "여유 횟수 3개(RIR 3) / 턴 부상 방지기",
+        items: [
+          { role: "주동근", cls: "role-main", name: "런지 천천히 내려가기 (3초 감속 훈련)", desc: "전력 질주 후 급정거 시 무릎과 발목에 가해지는 충격을 버티는 힘", dose: "좌우 8회 × 3세트", alt: "대체: 사이드 런지 천천히 내려가기" },
+          { role: "보조근", cls: "role-sub", name: "스케이트 점프 & 한발 착지 2초 버티기", desc: "방향 전환 시 무릎이 안쪽으로 꺾이지 않도록 잡아주는 제어력", dose: "좌우 8회 × 3세트", alt: "대체: 전방 점프 후 두발 급정거 착지" },
+          { role: "실기전이", cls: "role-transfer", name: "사다리(래더) 빠른 스텝 & 라인 밟기 드릴", desc: "지면 접촉 시간을 줄이는 경쾌하고 빠른 잔발 리듬 형성", dose: "20초 × 4세트", alt: "대체: 제자리 빠른 발 구르기" },
+          { role: "코어", cls: "role-core", name: "코펜하겐 플랭크 (사이드 플랭크 다리 들기)", desc: "급격한 방향 전환 및 사이드스텝 시 사타구니(내전근) 부상 예방", dose: "좌우 25초 × 3세트", alt: "대체: 옆으로 누워 안쪽 다리 들기" }
+        ]
+      },
+      p2: {
+        title: "2단계: 측면 지면 밀어내기 및 재가속 파워",
+        meta: "여유 횟수 2개(RIR 2) / 코너링 과부하",
+        items: [
+          { role: "주동근", cls: "role-main", name: "사이드 런지 폭발적 밀어내기", desc: "턴 지점에서 지면을 강하게 차고 반대 방향으로 튕겨 나가는 추진력", dose: "좌우 8회 × 4세트", alt: "대체: 밴드 허리에 걸고 측면 치고 나가기" },
+          { role: "보조근", cls: "role-sub", name: "런지 점프 (스플릿 스쿼트 점프)", desc: "낮은 턴 자세에서 첫 발 스타트를 폭발시키는 하체 순발력", dose: "좌우 6회 × 4세트", alt: "대체: 제자리 낮은 자세 점프 스쿼트" },
+          { role: "실기전이", cls: "role-transfer", name: "5m 초단거리 피치 재가속 달리기", desc: "무게중심을 낮춘 상태에서 첫 3~4보 회전 속도를 끌어올리기", dose: "5회 × 4세트", alt: "대체: 밴드 저항 스타트 가속 달리기" },
+          { role: "코어", cls: "role-core", name: "러시안 트위스트 & 메디신볼 좌우 회전", desc: "몸통 턴 동작 시 원심력을 버티고 상체를 빠르게 돌리는 옆구리 힘", dose: "15회 × 3세트", alt: "대체: 밴드 몸통 회전 당기기" }
+        ]
+      },
+      p3: {
+        title: "3단계: 반응성 방향전환 및 실기 코스 턴 타임어택",
+        meta: "100% 전력 수행 / 세트 간 완전 휴식",
+        items: [
+          { role: "주동근", cls: "role-main", name: "10m/20m 실기 규격 목재·라인 터치 인터벌", desc: "턴 자세 손터치·목재 터치 특화 폼 100% 출력", dose: "왕복 3회 × 4세트", alt: "대체: Z자·십자 코스 전력 턴 반복" },
+          { role: "보조근", cls: "role-sub", name: "호루라기·손신호 반응 방향전환 드릴", desc: "신호에 즉각 반응하여 급정거-턴-가속을 매끄럽게 연결", dose: "15초 × 4세트", alt: "대체: 파트너 지시 방향 터치 달리기" },
+          { role: "실기전이", cls: "role-transfer", name: "크로스 스텝 첫 발 치고 나가기", desc: "턴 직후 바깥쪽 발을 교차해 멀리 뻗으며 추진력을 얻는 스텝 기술", dose: "5m × 4세트", alt: "대체: 사이드 스텝 후 전방 대시" },
+          { role: "실기폼", cls: "role-core", name: "실기 규격 코스 100% 타임어택 리허설", desc: "라인 밟기·목재 미터치 파울 방지 및 최단 동선 코너링 완성", dose: "1회 전력 × 4세트", alt: "대체: 구간별 랩타임(출발-턴-도착) 체크" }
+        ]
+      }
+    },
+
+    endurance: {
+      p1: {
+        title: "1단계: 주동근 기초 근력 및 네거티브 버티기 적응",
+        meta: "여유 횟수 3개(RIR 3) / 정확한 실기 자세 정립",
+        items: [
+          { role: "주동근", cls: "role-main", name: "네거티브 수축 훈련 (3초 버티며 천천히 내려오기)", desc: "근섬유 동원율을 높이고 관절 주변 힘줄을 강화하는 기초 훈련", dose: "6~8회 × 4세트", alt: "대체: 탄력 밴드 보조 정자세 반복" },
+          { role: "보조근", cls: "role-sub", name: "날개뼈 당기기·밀기 (또는 리버스 크런치)", desc: "실기 센서 파울을 피하기 위한 정확한 시작·끝 지점 가동성", dose: "12회 × 3세트", alt: "대체: 무릎 대고 정자세 반복" },
+          { role: "실기전이", cls: "role-transfer", name: "정지 상태(데드스톱) 1회씩 끊어 폭발하기", desc: "반동 없이 정지 상태에서 주동근 힘만으로 빠르게 밀고 당기기", dose: "8회 × 3세트", alt: "대체: 메트로놈 박자 맞춤 정자세 반복" },
+          { role: "코어", cls: "role-core", name: "배꼽 당기기(할로우 홀드) & 플랭크 버티기", desc: "반복 동작 중 허리 튕기기(치팅)를 막고 힘을 모으는 몸통 고정", dose: "35초 × 3세트", alt: "대체: 데드버그 코어 고정" }
+        ]
+      },
+      p2: {
+        title: "2단계: 근지구력 반복량 확장 및 짧은 휴식 적응",
+        meta: "여유 횟수 1~2개 / 세트 간 휴식 단축",
+        items: [
+          { role: "주동근", cls: "role-main", name: "EMOM 훈련 (1분마다 목표 개수 수행 후 남은 시간 휴식)", desc: "피로가 누적된 상태에서도 자세가 무너지지 않는 실전 근지구력", dose: "10분 연속 (총 10세트)", alt: "대체: 피라미드 세트 (5-8-10-8-5회)" },
+          { role: "보조근", cls: "role-sub", name: "실기 동작 1.5배속 가속 반복 훈련", desc: "올라가고 내려가는 전환 속도를 높여 초당 반복 횟수 향상", dose: "15~20회 × 4세트", alt: "대체: 밴드 탄성 이용 고속 반복" },
+          { role: "실기전이", cls: "role-transfer", name: "반대 근육 보강 (낮은 철봉 당기기 / 슈퍼맨 버티기)", desc: "앞뒤 근육 불균형으로 인한 자세 붕괴 및 어깨 말림 방지", dose: "12회 × 3세트", alt: "대체: 밴드 얼굴 쪽으로 당기기(페이스 풀)" },
+          { role: "코어", cls: "role-core", name: "V-업 & 바이시클 크런치 연속", desc: "복부 및 고관절 굴곡근의 국소 피로 저항성 증대", dose: "20회 × 3세트", alt: "대체: 앉아서 무릎 가슴으로 당기기" }
+        ]
+      },
+      p3: {
+        title: "3단계: 근피로(젖산) 돌파 및 실기 센서 60초 타임어택",
+        meta: "실전 경기 페이스 / 최대 스피드 지속",
+        items: [
+          { role: "주동근", cls: "role-main", name: "30초 최대 속도 타임 인터벌 (초반 스퍼트 특화)", desc: "시작 후 첫 30초 동안 최대 개수를 뽑아내는 무산소 스피드 파워", dose: "30초 전력 × 5세트", alt: "대체: 20초 전력 + 10초 휴식 (타바타)" },
+          { role: "보조근", cls: "role-sub", name: "근피로 상태 한계 돌파 드롭 세트", desc: "지친 상태에서 쉬지 않고 쉬운 자세로 바꿔 끝까지 개수 채우기", dose: "최대 반복 × 3세트", alt: "대체: 40초 연속 수행 후 20초 휴식" },
+          { role: "실기전이", cls: "role-transfer", name: "호흡 리듬 동기화 (힘 쓸 때 짧고 강하게 내뱉기)", desc: "호흡이 막혀 얼굴이 붉어지고 조기 탈진하는 현상 방지", dose: "45초 × 3세트", alt: "대체: 2회당 1호흡 리듬 체크" },
+          { role: "실기폼", cls: "role-core", name: "실제 측정 센서·규정 동일 1분 모의 테스트", desc: "카운트 파울 제로(0) 및 목표 만점 개수 달성 실전 리허설", dose: "1분 전력 × 2세트", alt: "대체: 심판 기준 자세 영상 촬영 체크" }
+        ]
+      }
+    },
+
+    flex_front: {
+      p1: {
+        title: "1단계: 허벅지 뒤 근막 이완 및 PNF 저항 스트레칭",
+        meta: "주 5~7회 매일 수행 권장 / 반동 금지",
+        items: [
+          { role: "주동근", cls: "role-main", name: "수건/밴드 이용 PNF 수축-이완 스트레칭", desc: "10초 늘리기 → 6초 뒤꿈치로 저항 밀기 → 15초 더 깊이 늘리기", dose: "좌우 4회 × 3세트", alt: "대체: 파트너 보조 햄스트링 스트레칭" },
+          { role: "보조근", cls: "role-sub", name: "폼롤러 허벅지 뒤(햄스트링)·종아리·엉덩이 풀기", desc: "굳어있는 근육 긴장을 낮추어 스트레칭 수용 준비", dose: "부위별 90초 (총 10분)", alt: "대체: 마사지볼로 발바닥·종아리 이완" },
+          { role: "실기전이", cls: "role-transfer", name: "고양이-소 자세 & 앉아서 골반 앞뒤 기울이기", desc: "등만 굽히지 않고 골반 자체를 앞으로 접는 힙 힌지 감각", dose: "12회 × 3세트", alt: "대체: 의자에 앉아 허리 펴고 숙이기" },
+          { role: "코어", cls: "role-core", name: "코끼리 걸음 (상체 숙여 무릎 교대로 펴기)", desc: "상체를 숙인 채 한쪽 무릎씩 펴주며 다리 뒤쪽 신경 가동성 확보", dose: "좌우 15회 × 3세트", alt: "대체: 서서 교대로 허벅지 뒤 늘리기" }
+        ]
+      },
+      p2: {
+        title: "2단계: 골반 접힘 각도 확장 및 능동 유연성",
+        meta: "통증 없는 최대 지점 유지",
+        items: [
+          { role: "주동근", cls: "role-main", name: "척추 마디 숙이기 (제퍼슨 컬)", desc: "목-등-허리-허벅지 뒤까지 후면 사슬 전체를 한 마디씩 늘리는 훈련", dose: "6회(하단 5초 정지) × 3세트", alt: "대체: 앉아서 다리 펴고 천천히 상체 숙이기" },
+          { role: "보조근", cls: "role-sub", name: "앉아서 다리 펴고 복근 힘으로 상체 당기기", desc: "손으로 억지로 당기지 않고 내 배와 고관절 힘으로 상체를 다리에 밀착", dose: "10초 버티기 × 5세트", alt: "대체: 누워서 다리 수직으로 들어올리기" },
+          { role: "실기전이", cls: "role-transfer", name: "벽 밀기 종아리·오금 스트레칭", desc: "무릎 뒤쪽(오금)과 종아리 팽팽함으로 인한 발목 당김 해소", dose: "좌우 30초 × 3세트", alt: "대체: 계단 끝에 발 앞꿈치 대고 뒤꿈치 내리기" },
+          { role: "코어", cls: "role-core", name: "앉아서 다리 들어올리기 (복근·고관절 앞 수축)", desc: "앞쪽 근육을 강하게 수축시켜 뒤쪽(햄스트링)이 자연스럽게 풀리도록 유도", dose: "10회 × 3세트", alt: "대체: 벽에 등 대고 다리 들어올리기" }
+        ]
+      },
+      p3: {
+        title: "3단계: 실기 측정판 호흡 연동 최대 밀기 피킹",
+        meta: "숨을 길게 내쉬며 5초 정지 훈련",
+        items: [
+          { role: "주동근", cls: "role-main", name: "좌전굴 측정 자세 5초 날숨 밀기 훈련", desc: "숨을 길게 내쉬며 상체 힘을 빼서 마지막 2~3cm 추가 전진", dose: "5초 정지 × 8회", alt: "대체: 수건 발바닥 걸고 호흡에 맞춰 당기기" },
+          { role: "보조근", cls: "role-sub", name: "양손 수평 유지 및 무릎 굽힘 방지 고정 훈련", desc: "한쪽 손만 나가는 파울 및 무릎이 뜨는 현상 완벽 교정", dose: "15초 정지 × 4세트", alt: "대체: 파트너 무릎 위 가벼운 손 터치 체크" },
+          { role: "실기전이", cls: "role-transfer", name: "날개뼈 앞으로 뽑아 팔 뻗기 드릴", desc: "등 날개뼈를 앞으로 밀어내어 손끝 도달 거리 1~2cm 추가 확보", dose: "10회 × 3세트", alt: "대체: 벽 앞에서 손끝 최대한 앞으로 밀기" },
+          { role: "실기폼", cls: "role-core", name: "실기 워밍업(5분) 직후 2회 연속 측정 리허설", desc: "시험장 대기 시간 동안 체온과 유연성을 최상으로 유지하는 루틴", dose: "2회 측정 × 3세트", alt: "대체: 측정 직전 다리 스윙 동적 워밍업" }
+        ]
+      }
+    },
+
+    flex_back: {
+      p1: {
+        title: "1단계: 골반 앞쪽·복부 이완 및 등(흉추) 가동성",
+        meta: "주 5~7회 수행 / 허리 꺾임 주의",
+        items: [
+          { role: "주동근", cls: "role-main", name: "런지 자세 고관절 앞쪽(장요근) 깊은 스트레칭", desc: "골반 앞쪽이 뻣뻣해 허리만 꺾이는 현상을 막는 필수 이완", dose: "좌우 30초 × 4세트", alt: "대체: 벤치에 뒷발 올리고 골반 앞 늘리기" },
+          { role: "보조근", cls: "role-sub", name: "폼롤러 등(흉추) 대고 뒤로 젖히기", desc: "허리(요추)가 아닌 등 위쪽(흉추)이 부드럽게 아치를 그리도록 유도", dose: "10회(3초 정지) × 3세트", alt: "대체: 벤치에 팔꿈치 대고 등 아래로 누르기" },
+          { role: "실기전이", cls: "role-transfer", name: "스핑크스 & 코브라 자세 (복부 전면 늘리기)", desc: "골반을 바닥에 붙인 채 복부 전면 길이를 점진적으로 확장", dose: "20초 유지 × 4세트", alt: "대체: 짐볼 위에 등 대고 뒤로 젖히기" },
+          { role: "코어", cls: "role-core", name: "데드버그 & 복식호흡 갈비뼈 확장", desc: "상체를 젖힐 때 가슴과 복부가 자연스럽게 늘어나는 호흡법", dose: "8회 × 3세트", alt: "대체: 누워서 만세 자세 호흡 스트레칭" }
+        ]
+      },
+      p2: {
+        title: "2단계: 등(흉추)·어깨 신전 가동범위 확장",
+        meta: "고관절 펴기와 등 젖히기의 조화",
+        items: [
+          { role: "주동근", cls: "role-main", name: "벽에 등 대고 팔 올리기 (월 엔젤) & 등 회전", desc: "만세 자세에서 팔과 어깨가 뒤로 충분히 넘어가는 가동성 확보", dose: "10회 × 3세트", alt: "대체: 수건/밴드 잡고 머리 뒤로 팔 넘기기" },
+          { role: "보조근", cls: "role-sub", name: "힙 브릿지 & 낙타 자세 (골반 밀며 후굴)", desc: "엉덩이 수축으로 골반을 앞으로 밀어주며 안전하게 상체 후굴", dose: "15초 유지 × 4세트", alt: "대체: 브릿지 자세 부분 신전" },
+          { role: "실기전이", cls: "role-transfer", name: "엎드려 상체 들기 (슈퍼맨 3초 버티기)", desc: "수동 스트레칭을 넘어 스스로 상체를 들어 올리는 척추기립근 근력", dose: "8회 × 3세트", alt: "대체: 엎드려 Y-T-W 팔 들기" },
+          { role: "코어", cls: "role-core", name: "버드독 & 교대 팔다리 들기 (스위머)", desc: "척추 안정성을 유지하면서 등·엉덩이 후면 전체를 수축", dose: "좌우 10회 × 3세트", alt: "대체: 네발기기 자세 대각선 팔다리 뻗기" }
+        ]
+      },
+      p3: {
+        title: "3단계: 척추기립근 능동 수축 및 실기 후굴 각도 고정",
+        meta: "실기 측정 자세 3~5초 정지 버티기",
+        items: [
+          { role: "주동근", cls: "role-main", name: "척추기립근 전력 수축 실기 후굴 5초 버티기", desc: "팔과 시선을 뒤로 던지며 등·허리 근력으로 최고점 도달 후 정지", dose: "5초 정지 × 6회", alt: "대체: 백 익스텐션 기구 상단 정지 버티기" },
+          { role: "보조근", cls: "role-sub", name: "발목 고정 상태 골반 앞으로 밀기 & 무릎 펴기", desc: "체후굴 측정 시 무릎이 굽혀지거나 발이 떨어지는 감점 방지", dose: "5회 × 3세트", alt: "대체: 파트너 발목 고정 후굴 연습" },
+          { role: "실기전이", cls: "role-transfer", name: "고개 젖히기 및 시선 천장·바닥 유도 드릴", desc: "시선 처리를 통해 등 상부 아치를 2~3cm 더 끌어올리는 기술", dose: "6회 × 3세트", alt: "대체: 거울/영상 측면 아치 각도 확인" },
+          { role: "실기폼", cls: "role-core", name: "실기 규격 측정기 동일 폼 2회 연속 리허설", desc: "어지럼증 방지 호흡법(숨 참지 않기)과 최고점 정지 완성", dose: "2회 측정 × 3세트", alt: "대체: 측정 직전 등·고관절 3분 루틴" }
+        ]
+      }
+    }
+  };
+
+  // 4. PAPS 5대 영역 전체 데이터베이스
+  const papsDB = {
+    cardio: {
+      title: "심폐지구력 (왕복오래달리기 / 오래달리기)",
+      fitt: [
+        { label: "Frequency (빈도)", detail: "주 3 ~ 5회 (격일제 유산소 및 인터벌 병행)", val: "주 3~5회" },
+        { label: "Intensity (강도)", detail: "여유심박수 60~75% (숨이 차지만 짧은 대화 가능)", val: "중강도" },
+        { label: "Time & Type (시간/형태)", detail: "1회 30~40분 / 지속주 조깅 + 1분 빠르게-1분 걷기 인터벌", val: "30~40분" }
+      ],
+      routine: [
+        { role: "준비(5분)", cls: "role-main", name: "관절 돌리기 스트레칭 & 빠른 걷기", desc: "발목·무릎·고관절 체온 상승", dose: "5분" },
+        { role: "본운동(25분)", cls: "role-transfer", name: "인터벌 러닝 (2분 조깅 + 1분 빠른 달리기 반복)", desc: "심폐 지구력 및 최대산소섭취량 향상", dose: "7~8라운드" },
+        { role: "정리(5분)", cls: "role-core", name: "느린 걷기 & 하체 정적 스트레칭", desc: "심박수 안정화 및 피로 물질 제거", dose: "5분" }
+      ]
+    },
+    flexibility: {
+      title: "유연성 (앉아윗몸앞굽히기 / 종합유연성)",
+      fitt: [
+        { label: "Frequency (빈도)", detail: "주 5 ~ 7회 (매일 샤워 후 체온이 높을 때 수행 권장)", val: "주 5~7회" },
+        { label: "Intensity (강도)", detail: "통증이 아닌 '기분 좋게 당기는 느낌' 지점 유지", val: "저~중강도" },
+        { label: "Time & Type (시간/형태)", detail: "1회 15~20분 / 부위별 20~30초 정적 스트레칭 3세트", val: "15~20분" }
+      ],
+      routine: [
+        { role: "이완(5분)", cls: "role-main", name: "폼롤러 허벅지 뒤(햄스트링)·종아리·등 풀기", desc: "근육 긴장 완화 및 혈류량 증가", dose: "부위별 60초" },
+        { role: "본운동(10분)", cls: "role-transfer", name: "앉아서 다리 펴고 숙이기 · 나비 자세 · 고양이 자세", desc: "반동 없이 천천히 호흡을 내쉬며 25초간 정지", dose: "부위별 3세트" },
+        { role: "보강(5분)", cls: "role-core", name: "어깨 등 뒤 맞잡기 & 옆구리 늘리기", desc: "종합유연성 상·하체 전신 가동범위 균형", dose: "좌우 20초 × 2세트" }
+      ]
+    },
+    strength: {
+      title: "근력 · 근지구력 (윗몸말아올리기 / 팔굽혀펴기 / 악력)",
+      fitt: [
+        { label: "Frequency (빈도)", detail: "주 3회 (근육 회복을 위해 최소 48시간 간격 유지)", val: "주 3회" },
+        { label: "Intensity (강도)", detail: "마지막 2~3개가 약간 힘들게 느껴지는 맨몸 저항", val: "중강도" },
+        { label: "Time & Type (시간/형태)", detail: "1회 30~40분 / 대근육 위주 맨몸 순환 운동(서킷)", val: "30~40분" }
+      ],
+      routine: [
+        { role: "상체(10분)", cls: "role-main", name: "무릎 대고 팔굽혀펴기 (또는 정자세) & 철봉 매달리기", desc: "가슴·팔 근지구력 및 악력 동시 향상", dose: "10~15회 × 3세트" },
+        { role: "코어(10분)", cls: "role-transfer", name: "윗몸 말아올리기 & 플랭크 버티기", desc: "목 반동 없이 복부 힘으로 날개뼈 떼기", dose: "15회 / 30초 × 3세트" },
+        { role: "하체(10분)", cls: "role-core", name: "맨몸 스쿼트 & 런지", desc: "전신 대근육 기초 근력 구축", dose: "15회 × 3세트" }
+      ]
+    },
+    power: {
+      title: "순발력 (50m 달리기 / 제자리멀리뛰기)",
+      fitt: [
+        { label: "Frequency (빈도)", detail: "주 2 ~ 3회 (피로가 없는 컨디션 최상일 때 수행)", val: "주 2~3회" },
+        { label: "Intensity (강도)", detail: "최대 노력(100% 스피드/높이) 수행 후 세트 간 충분한 휴식", val: "고강도/짧게" },
+        { label: "Time & Type (시간/형태)", detail: "1회 25~35분 / 저충격 점프 및 단거리 스타트 가속 훈련", val: "25~35분" }
+      ],
+      routine: [
+        { role: "워밍업(8분)", cls: "role-main", name: "제자리 무릎 높이 들기 & 발목 점프", desc: "신경계 활성화 및 아킬레스건 예열", dose: "20초 × 3세트" },
+        { role: "점프(10분)", cls: "role-transfer", name: "스쿼트 점프 & 줄넘기 2단뛰기(또는 빠른 외발뛰기)", desc: "지면을 강하게 차고 오르는 하체 탄성 훈련", dose: "8~10회 × 3세트" },
+        { role: "스피드(10분)", cls: "role-core", name: "20m 단거리 전력 질주 스타트", desc: "신호 반응 후 폭발적인 첫 발 가속", dose: "4회 (휴식 90초)" }
+      ]
+    },
+    bmi: {
+      title: "비만 및 체중 관리 (체질량지수 BMI 개선)",
+      fitt: [
+        { label: "Frequency (빈도)", detail: "주 4 ~ 5회 (일일 에너지 소비량 증대 목적)", val: "주 4~5회" },
+        { label: "Intensity (강도)", detail: "여유심박수 50~65% (무릎·발목 보호를 위한 저충격 유산소)", val: "저~중강도" },
+        { label: "Time & Type (시간/형태)", detail: "1회 40~50분 / 빠른 걷기, 실내 자전거, 수영, 전신 순환 운동", val: "40~50분" }
+      ],
+      routine: [
+        { role: "관절보호(5분)", cls: "role-main", name: "발목·무릎·고관절 돌리기 및 가벼운 제자리 걷기", desc: "체중 부하로 인한 관절 충격 사전 예방", dose: "5분" },
+        { role: "유산소(30분)", cls: "role-transfer", name: "파워 워킹 (팔을 크게 흔들며 빠르게 걷기) 또는 실내 자전거", desc: "지방 연소 효율이 가장 높은 중저강도 지속 유산소", dose: "30분 연속" },
+        { role: "근력순환(10분)", cls: "role-core", name: "의자 스쿼트 · 벽 짚고 팔굽혀펴기 · 버드독", desc: "기초대사량 유지를 위한 무리 없는 전신 근력 보강", dose: "12회 × 2세트" }
+      ]
+    }
+  };
+
+  function switchMode(mode) {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const entranceMode = document.getElementById('entrance-mode');
+    const papsMode = document.getElementById('paps-mode');
+    const resultSec = document.getElementById('result-section');
+
+    resultSec.classList.remove('active');
+
+    if (mode === 'entrance') {
+      tabs[0].classList.add('active');
+      tabs[1].classList.remove('active');
+      entranceMode.style.display = 'block';
+      papsMode.style.display = 'none';
+    } else {
+      tabs[1].classList.add('active');
+      tabs[0].classList.remove('active');
+      entranceMode.style.display = 'none';
+      papsMode.style.display = 'block';
+    }
+  }
+
+  // 종목 변경 시 단위, 예시 숫자, 그리고 '종목 핵심 추천 취약점' 목록을 자동 업데이트
+  function updateSportUnit() {
+    const select = document.getElementById('sport-select');
+    const selectedOpt = select.options[select.selectedIndex];
+    const unit = selectedOpt.getAttribute('data-unit');
+    const p1 = selectedOpt.getAttribute('data-p1');
+    const p2 = selectedOpt.getAttribute('data-p2');
+    const cat = selectedOpt.getAttribute('data-cat');
+    const sportTitle = selectedOpt.text.split('(')[0].trim();
+
+    document.getElementById('curr-unit').textContent = unit;
+    document.getElementById('target-unit').textContent = unit;
+    document.getElementById('curr-record').placeholder = `숫자 입력 (예: ${p1})`;
+    document.getElementById('target-record').placeholder = `숫자 입력 (예: ${p2})`;
+
+    // 추천 취약점 optgroup 업데이트
+    const recGroup = document.getElementById('recommended-weaknesses');
+    recGroup.label = `⭐ [${sportTitle}] 핵심 추천 취약점`;
+    const list = categoryWeaknesses[cat] || categoryWeaknesses['lower_power'];
+    
+    recGroup.innerHTML = list.map(w => `<option value="${w.val}">${w.text}</option>`).join('');
+    document.getElementById('weakness-select').selectedIndex = 0;
+  }
+
+  function generateEntrancePrescription(e) {
+    e.preventDefault();
+    const currInput = document.getElementById('curr-record').value.trim();
+    const targetInput = document.getElementById('target-record').value.trim();
+
+    if (!currInput || !targetInput) {
+      alert("현재 기록과 목표 기록 칸에 숫자를 직접 입력해 주세요!");
+      if (!currInput) document.getElementById('curr-record').focus();
+      else document.getElementById('target-record').focus();
+      return;
+    }
+
+    const select = document.getElementById('sport-select');
+    const selectedOpt = select.options[select.selectedIndex];
+    const sportName = selectedOpt.text;
+    const dir = selectedOpt.getAttribute('data-dir');
+    const unit = selectedOpt.getAttribute('data-unit');
+    const cat = selectedOpt.getAttribute('data-cat');
+
+    const weaknessSelect = document.getElementById('weakness-select');
+    const weaknessVal = weaknessSelect.value;
+    const weaknessText = weaknessSelect.options[weaknessSelect.selectedIndex].text.split('(')[0].trim();
+
+    const curr = parseFloat(currInput);
+    const target = parseFloat(targetInput);
+    const weeks = parseInt(document.getElementById('prep-period').value);
+    const freq = document.getElementById('freq').value;
+
+    let gap = dir === 'max' ? (target - curr) : (curr - target);
+    gap = Math.round(gap * 10) / 10;
+
+    const summaryBox = document.getElementById('summary-box');
+    summaryBox.innerHTML = `
+      <div class="summary-item"><div class="label">선택 종목</div><div class="val" style="font-size:15px;">${sportName}</div></div>
+      <div class="summary-item"><div class="label">목표 격차(GAP)</div><div class="val">${gap > 0 ? '+' : ''}${gap} ${unit}</div></div>
+      <div class="summary-item"><div class="label">1순위 보완 취약점</div><div class="val" style="font-size:13px; color:#fda4af;">${weaknessText}</div></div>
+    `;
+
+    document.getElementById('strategy-box').innerHTML = `
+      <strong>[개인별 취약점 집중 보완 전략 - ${weaknessText} / ${weeks}주·주 ${freq}회]</strong><br>
+      목표 격차 <strong>${gap > 0 ? '+' : ''}${gap}${unit}</strong>를 돌파하기 위해 각 단계 최상단에 <strong>[🎯 취약점 집중]</strong> 보강 훈련이 우선 배치되었으며, 이어서 <strong>[주동근 + 보조근 + 실기전이 + 코어]</strong> 루틴이 조합됩니다. 훈련 정체 시 노란색 <strong>[🔄 대체 운동]</strong>으로 교체해 수행하세요.
+    `;
+
+    let p1Weeks = Math.max(1, Math.round(weeks * 0.3));
+    let p2Weeks = Math.max(1, Math.round(weeks * 0.4));
+
+    const data = expandedEntranceDB[cat];
+    const bDrill = bottleneckDrills[weaknessVal];
+
+    const phases = [
+      { info: data.p1, priority: bDrill ? bDrill.p1 : null, period: `1 ~ ${p1Weeks}주차` },
+      { info: data.p2, priority: bDrill ? bDrill.p2 : null, period: `${p1Weeks + 1} ~ ${p1Weeks + p2Weeks}주차` },
+      { info: data.p3, priority: bDrill ? bDrill.p3 : null, period: `${p1Weeks + p2Weeks + 1} ~ ${weeks}주차` }
+    ];
+
+    let html = '';
+    phases.forEach(p => {
+      let priorityHtml = '';
+      if (p.priority) {
+        priorityHtml = `
+          <li class="exercise-item priority-item">
+            <div>
+              <span class="ex-role role-priority">🎯 취약점 1순위</span>
+              <span class="ex-info">${p.priority.name}</span>
+              <div class="ex-detail">${p.priority.desc}</div>
+              <div class="ex-alt">🔄 ${p.priority.alt}</div>
+            </div>
+            <div class="ex-dosage">${p.priority.dose}</div>
+          </li>
+        `;
+      }
+
+      let itemsHtml = p.info.items.map(item => `
+        <li class="exercise-item">
+          <div>
+            <span class="ex-role ${item.cls}">${item.role}</span>
+            <span class="ex-info">${item.name}</span>
+            <div class="ex-detail">${item.desc}</div>
+            <div class="ex-alt">🔄 ${item.alt}</div>
+          </div>
+          <div class="ex-dosage">${item.dose}</div>
+        </li>
+      `).join('');
+
+      html += `
+        <div class="phase-card">
+          <div class="phase-header">
+            <span class="phase-title">${p.info.title}</span>
+            <span class="phase-period">${p.period} (${p.info.meta})</span>
+          </div>
+          <ul class="exercise-list">${priorityHtml}${itemsHtml}</ul>
+        </div>
+      `;
+    });
+
+    document.getElementById('phase-container').innerHTML = html;
+    document.getElementById('result-section').classList.add('active');
+    document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function generatePapsPrescription(e) {
+    e.preventDefault();
+    const type = document.getElementById('paps-type').value;
+    const grade = document.getElementById('paps-grade').value;
+    const data = papsDB[type];
+
+    let gradeGuide = "";
+    if (grade === "5") {
+      gradeGuide = `<strong>[5등급 집중관리 가이드]</strong> 기초 체력이 매우 낮아 부상 위험이 높습니다. 첫 2~3주간은 제시된 강도보다 <strong>20% 낮춰 몸이 운동에 적응하는 기간</strong>을 반드시 가지세요.`;
+    } else if (grade === "4") {
+      gradeGuide = `<strong>[4등급 저체력 탈출 가이드]</strong> 주 3회 이상 규칙적인 신체활동 습관을 형성하여 <strong>8주 내 3등급(보통) 진입</strong>을 1차 목표로 설정합니다.`;
+    } else {
+      gradeGuide = `<strong>[3등급 체력 도약 가이드]</strong> 평균 수준의 체력을 보유하고 있습니다. 운동 시간과 강도를 점진적으로 높여 <strong>2등급 이상 우수 체력</strong>으로 도약하세요.`;
+    }
+
+    const summaryBox = document.getElementById('summary-box');
+    summaryBox.innerHTML = `
+      <div class="summary-item"><div class="label">PAPS 영역</div><div class="val" style="font-size:15px;">${data.title.split('(')[0]}</div></div>
+      <div class="summary-item"><div class="label">현재 등급</div><div class="val">${grade}등급</div></div>
+      <div class="summary-item"><div class="label">목표</div><div class="val">3등급 이상 진입</div></div>
+    `;
+
+    document.getElementById('strategy-box').innerHTML = gradeGuide;
+
+    let fittHtml = data.fitt.map(f => `
+      <li class="exercise-item">
+        <div>
+          <span class="ex-info">${f.label}</span>
+          <div class="ex-detail">${f.detail}</div>
+        </div>
+        <div class="ex-dosage">${f.val}</div>
+      </li>
+    `).join('');
+
+    let routineHtml = data.routine.map(r => `
+      <li class="exercise-item">
+        <div>
+          <span class="ex-role ${r.cls}">${r.role}</span>
+          <span class="ex-info">${r.name}</span>
+          <div class="ex-detail">${r.desc}</div>
+        </div>
+        <div class="ex-dosage">${r.dose}</div>
+      </li>
+    `).join('');
+
+    document.getElementById('phase-container').innerHTML = `
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-title">1. ACSM 기반 FITT 운동 처방 기준</span>
+          <span class="phase-period">${data.title}</span>
+        </div>
+        <ul class="exercise-list">${fittHtml}</ul>
+      </div>
+      <div class="phase-card">
+        <div class="phase-header">
+          <span class="phase-title">2. PAPS 맞춤형 실전 순환 루틴</span>
+          <span class="phase-period">준비 → 본운동 → 정리</span>
+        </div>
+        <ul class="exercise-list">${routineHtml}</ul>
+      </div>
+    `;
+
+    document.getElementById('result-section').classList.add('active');
+    document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function toggleTimer() {
+    const timerBox = document.getElementById('timer-box');
+    timerBox.style.display = timerBox.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function startTimer(seconds) {
+    clearInterval(timerInterval);
+    let timeLeft = seconds;
+    const display = document.getElementById('timer-val');
+
+    function updateDisplay() {
+      const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const s = String(timeLeft % 60).padStart(2, '0');
+      display.textContent = `${m}:${s}`;
+    }
+
+    updateDisplay();
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      if (timeLeft < 0) {
+        clearInterval(timerInterval);
+        display.textContent = "휴식 완료! 다음 세트 시작!";
+      } else {
+        updateDisplay();
+      }
+    }, 1000);
+  }
+
+  function stopTimer() {
+    clearInterval(timerInterval);
+    document.getElementById('timer-val').textContent = "00:00";
+  }
+
+  function copyPrescription() {
+    const summary = document.getElementById('summary-box').innerText;
+    const strategy = document.getElementById('strategy-box').innerText;
+    const phases = document.getElementById('phase-container').innerText;
+    const fullText = `[PE-Fit 맞춤형 운동 처방전]\n\n${summary}\n\n${strategy}\n\n${phases}`;
+    
+    navigator.clipboard.writeText(fullText).then(() => {
+      alert("맞춤형 처방전 전체 내용이 클립보드에 복사되었습니다!");
+    });
+  }
+
+  // 페이지 로드 시 초기 종목(제자리멀리뛰기) 추천 취약점 세팅
+  window.addEventListener('DOMContentLoaded', updateSportUnit);
+</script>
+</body>
+</html>
