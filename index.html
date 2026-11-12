@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PE-Fit 운동 처방 시스템</title>
-  <!-- Lucide Icons & Font -->
+  <title>PE-Fit 만점 대비 맞춤 운동 처방 시스템</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css">
   <style>
     :root {
@@ -14,6 +13,8 @@
       --input-bg: #0f1523;
       --accent-blue: #3b82f6;
       --accent-blue-hover: #2563eb;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
       --accent-purple: #8b5cf6;
       --text-main: #f1f5f9;
       --text-sub: #94a3b8;
@@ -24,27 +25,24 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif; }
     body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 20px; line-height: 1.5; }
 
-    .container { max-width: 900px; margin: 0 auto; }
+    .container { max-width: 960px; margin: 0 auto; }
 
-    /* Header & Navigation */
     header { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; margin-bottom: 24px; }
     .logo { display: flex; align-items: center; gap: 12px; }
-    .logo-icon { background: var(--accent-blue); width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; color: white; }
+    .logo-icon { background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 20px; color: white; }
     .logo-text h1 { font-size: 20px; font-weight: 700; color: var(--text-main); }
     .logo-text p { font-size: 13px; color: var(--text-sub); }
 
     .nav-tabs { display: flex; background: var(--card-bg); padding: 4px; border-radius: 30px; border: 1px solid var(--card-border); }
-    .tab-btn { background: none; border: none; color: var(--text-sub); padding: 8px 18px; border-radius: 20px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
+    .tab-btn { background: none; border: none; color: var(--text-sub); padding: 8px 18px; border-radius: 20px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
     .tab-btn.active { background: var(--accent-blue); color: white; }
 
-    /* Main Card Container */
     .main-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 28px; margin-bottom: 24px; }
-    .hero-banner { background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.05)); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: var(--radius); padding: 24px; margin-bottom: 28px; }
+    .hero-banner { background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.08)); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: var(--radius); padding: 24px; margin-bottom: 28px; }
     .badge { display: inline-block; background: rgba(59, 130, 246, 0.2); color: #60a5fa; padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
     .hero-banner h2 { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
     .hero-banner p { font-size: 14px; color: var(--text-sub); }
 
-    /* Form Section */
     .section-title { font-size: 17px; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--card-border); padding-bottom: 12px; }
     .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px; }
     .form-group.full { grid-column: span 2; }
@@ -55,29 +53,37 @@
     input:focus, select:focus { border-color: var(--accent-blue); }
     .unit { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-muted); }
 
-    /* Submit Button */
-    .btn-submit { width: 100%; background: var(--accent-blue); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-submit:hover { background: var(--accent-blue-hover); }
+    .btn-submit { width: 100%; background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple)); color: white; border: none; padding: 15px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-submit:hover { opacity: 0.95; }
 
-    /* Prescription Result Section */
     .result-container { display: none; margin-top: 24px; }
     .result-container.active { display: block; }
-    .summary-card { background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-around; text-align: center; }
+    .summary-card { background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; display: flex; justify-content: space-around; text-align: center; }
     .summary-item .label { font-size: 12px; color: var(--text-sub); }
-    .summary-item .val { font-size: 22px; font-weight: 800; color: #60a5fa; margin-top: 4px; }
+    .summary-item .val { font-size: 20px; font-weight: 800; color: #60a5fa; margin-top: 4px; }
 
-    .phase-card { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
-    .phase-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-    .phase-title { font-weight: 700; font-size: 16px; color: var(--accent-blue); }
-    .phase-period { font-size: 12px; background: rgba(255,255,255,0.06); padding: 4px 8px; border-radius: 4px; color: var(--text-sub); }
+    .strategy-box { background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 16px 20px; margin-bottom: 20px; font-size: 14px; color: #a7f3d0; line-height: 1.6; }
+    .strategy-box strong { color: #34d399; font-size: 15px; }
+
+    .phase-card { background: var(--input-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 22px; margin-bottom: 20px; }
+    .phase-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; border-bottom: 1px dashed var(--card-border); padding-bottom: 12px; }
+    .phase-title { font-weight: 700; font-size: 16px; color: #60a5fa; }
+    .phase-period { font-size: 12px; background: rgba(255,255,255,0.06); padding: 4px 10px; border-radius: 4px; color: var(--text-sub); }
 
     .exercise-list { list-style: none; }
-    .exercise-item { padding: 10px 0; border-bottom: 1px dashed var(--card-border); display: flex; justify-content: space-between; align-items: center; font-size: 14px; }
+    .exercise-item { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; font-size: 14px; }
     .exercise-item:last-child { border-bottom: none; }
-    .ex-info { font-weight: 600; }
-    .ex-detail { font-size: 13px; color: var(--text-sub); }
+    .ex-role { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; margin-right: 6px; }
+    .role-main { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+    .role-sub { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; }
+    .role-transfer { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; }
+    .role-core { background: rgba(245, 158, 11, 0.2); color: #fde047; }
+    
+    .ex-info { font-weight: 600; color: var(--text-main); font-size: 15px; }
+    .ex-detail { font-size: 13px; color: var(--text-sub); margin-top: 4px; }
+    .ex-alt { font-size: 12px; color: var(--accent-amber); margin-top: 5px; background: rgba(245, 158, 11, 0.08); padding: 4px 8px; border-radius: 4px; display: inline-block; }
+    .ex-dosage { text-align: right; font-weight: 700; color: #e2e8f0; white-space: nowrap; font-size: 13px; background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 6px; }
 
-    /* Utility Tools: Timer & Print */
     .utility-bar { display: flex; gap: 12px; margin-top: 24px; }
     .btn-secondary { flex: 1; background: var(--input-bg); border: 1px solid var(--card-border); color: var(--text-main); padding: 12px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
     .btn-secondary:hover { background: rgba(255,255,255,0.05); }
@@ -91,79 +97,72 @@
       .form-grid { grid-template-columns: 1fr; }
       .form-group.full { grid-column: span 1; }
       header { flex-direction: column; gap: 16px; align-items: flex-start; }
-    }
-
-    @media print {
-      body { background: white; color: black; padding: 0; }
-      .main-card, .hero-banner, .phase-card { background: white; border: 1px solid #ccc; color: black; }
-      .btn-submit, .nav-tabs, .utility-bar, form { display: none !important; }
-      .result-container { display: block !important; }
-      .summary-item .val { color: #1d4ed8; }
-      .phase-title { color: #1d4ed8; }
+      .exercise-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+      .ex-dosage { text-align: left; width: 100%; }
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <!-- Top Navigation -->
   <header>
     <div class="logo">
-      <div class="logo-icon">H</div>
+      <div class="logo-icon">MAX</div>
       <div class="logo-text">
-        <h1>PE-Fit 운동 처방 시스템</h1>
-        <p>학교 체육 및 체대입시 맞춤형 피지컬 트레이닝 프로그램</p>
+        <h1>PE-Fit 만점 대비 처방 시스템</h1>
+        <p>스포츠 과학 및 개인 취약점(Bottleneck) 맞춤 피지컬 프로그램</p>
       </div>
     </div>
     <div class="nav-tabs">
-      <button class="tab-btn active" onclick="switchMode('entrance')">⚡ 체대입시 트레이닝</button>
+      <button class="tab-btn active" onclick="switchMode('entrance')">⚡ 체대입시 파이널 만점</button>
       <button class="tab-btn" onclick="switchMode('paps')">❤ PAPS 건강체력</button>
     </div>
   </header>
 
-  <!-- Main Card -->
   <div class="main-card">
-    
-    <!-- MODE 1: 체대입시 트레이닝 -->
     <div id="entrance-mode">
       <div class="hero-banner">
-        <span class="badge">⚡ 체대입시 실기 능력 향상 모드</span>
-        <h2>과학적 3단계 주기화 트레이닝 시스템</h2>
-        <p>단순한 반복 훈련을 넘어 [1단계 건/힘줄 적응 ➔ 2단계 최대근력 ➔ 3단계 순발력/파워]로 이어지는 스포츠 과학 기반 가이드를 제공합니다.</p>
+        <span class="badge">⚡ 입시 만점 타겟 다이나믹 주기화</span>
+        <h2>취약점 타격 & 대체 종목 연동 시스템</h2>
+        <p>단순한 반복 훈련을 넘어 학생의 원인별 병목(Bottleneck)을 분석하고 15가지 세부 운동 풀 및 대체 운동을 동적으로 제공합니다.</p>
       </div>
 
-      <div class="section-title">🎛 실기 측정 및 조건 입력</div>
+      <div class="section-title">🎛 실기 측정치 및 취약점 세부 입력</div>
 
       <form id="entrance-form" onsubmit="generateEntrancePrescription(event)">
         <div class="form-grid">
           <div class="form-group full">
             <label for="sport-select">실기 종목 선택</label>
             <select id="sport-select" onchange="updateSportUnit()">
-              <optgroup label="순발력 & 파워">
-                <option value="longjump" data-unit="cm" data-dir="max">제자리멀리뛰기 (cm)</option>
-                <option value="sargent" data-unit="cm" data-dir="max">서전트 점프 / 제자리높이뛰기 (cm)</option>
-                <option value="medicineball" data-unit="m" data-dir="max">메디신볼 던지기 (m)</option>
-                <option value="backstrength" data-unit="kg" data-dir="max">배근력 (kg)</option>
-                <option value="handball" data-unit="m" data-dir="max">핸드볼 공 던지기 (m)</option>
+              <optgroup label="1. 하지 순발력 & 점프 파워">
+                <option value="longjump" data-unit="cm" data-dir="max" data-cat="lower_power">제자리멀리뛰기 (cm)</option>
+                <option value="sargent" data-unit="cm" data-dir="max" data-cat="lower_power">서전트 점프 / 제자리높이뛰기 (cm)</option>
               </optgroup>
-              <optgroup label="민첩성 & 스피드">
-                <option value="shuttle10m" data-unit="초" data-dir="min">10m 왕복달리기 (초)</option>
-                <option value="shuttle20m" data-unit="초" data-dir="min">20m 왕복달리기 (초)</option>
-                <option value="zrun" data-unit="초" data-dir="min">Z자 달리기 (초)</option>
-                <option value="crossrun" data-unit="초" data-dir="min">십자 달리기 (초)</option>
-                <option value="sidestep" data-unit="회" data-dir="max">사이드 스텝 (회)</option>
+              <optgroup label="2. 상지 & 코어 회전 파워">
+                <option value="medicineball" data-unit="m" data-dir="max" data-cat="upper_power">메디신볼 던지기 (m)</option>
+                <option value="handball" data-unit="m" data-dir="max" data-cat="upper_power">핸드볼 공 던지기 (m)</option>
               </optgroup>
-              <optgroup label="근력 & 근지구력">
-                <option value="situp" data-unit="회" data-dir="max">윗몸 일으키기 / 싯업 (회)</option>
-                <option value="pullup" data-unit="회" data-dir="max">턱걸이 / 오래매달리기 (회/초)</option>
-                <option value="pushup" data-unit="회" data-dir="max">팔굽혀펴기 (회)</option>
+              <optgroup label="3. 후면 사슬 최대 근력">
+                <option value="backstrength" data-unit="kg" data-dir="max" data-cat="max_strength">배근력 (kg)</option>
               </optgroup>
-              <optgroup label="유연성">
-                <option value="sitandreach" data-unit="cm" data-dir="max">앉아 윗몸 앞굽히기 / 좌전굴 (cm)</option>
-                <option value="backbending" data-unit="cm" data-dir="max">체후굴 / 상체 뒤로 젖히기 (cm)</option>
+              <optgroup label="4. 민첩성 & 감속·방향전환(COD)">
+                <option value="shuttle10m" data-unit="초" data-dir="min" data-cat="agility">10m 왕복달리기 (초)</option>
+                <option value="shuttle20m" data-unit="초" data-dir="min" data-cat="agility">20m 왕복달리기 (초)</option>
+                <option value="zrun" data-unit="초" data-dir="min" data-cat="agility">Z자 달리기 (초)</option>
+                <option value="crossrun" data-unit="초" data-dir="min" data-cat="agility">십자 달리기 (초)</option>
+                <option value="sidestep" data-unit="회" data-dir="max" data-cat="agility">사이드 스텝 (회)</option>
               </optgroup>
-              <optgroup label="구기 & 종합">
-                <option value="basketball" data-unit="회" data-dir="max">농구 레이업 슛 및 골밑 슛 (회)</option>
+              <optgroup label="5. 근지구력 & 반복 스피드">
+                <option value="situp" data-unit="회" data-dir="max" data-cat="endurance">윗몸 일으키기 / 싯업 (회)</option>
+                <option value="pullup" data-unit="회" data-dir="max" data-cat="endurance">턱걸이 / 오래매달리기 (회/초)</option>
+                <option value="pushup" data-unit="회" data-dir="max" data-cat="endurance">팔굽혀펴기 (회)</option>
+              </optgroup>
+              <optgroup label="6. 유연성 (전면 굴곡 vs 후면 신전)">
+                <option value="sitandreach" data-unit="cm" data-dir="max" data-cat="flex_front">앉아 윗몸 앞굽히기 / 좌전굴 (cm)</option>
+                <option value="backbending" data-unit="cm" data-dir="max" data-cat="flex_back">체후굴 / 상체 뒤로 젖히기 (cm)</option>
+              </optgroup>
+              <optgroup label="7. 구기 기능 및 스텝 밸런스">
+                <option value="basketball" data-unit="회" data-dir="max" data-cat="skill_ball">농구 레이업 슛 및 골밑 슛 (회)</option>
               </optgroup>
             </select>
           </div>
@@ -184,12 +183,22 @@
             </div>
           </div>
 
+          <div class="form-group full">
+            <label for="weakness-select">학생 개인별 집중 보완 취약점 (Bottleneck Target)</label>
+            <select id="weakness-select">
+              <option value="ankle_tendon">발목 강성 & 아킬레스건 탄력 부족 (튕겨주는 힘 미흡)</option>
+              <option value="base_strength">하체/전신 기초 근력 부족 (지면을 밀어내는 기본 힘 부족)</option>
+              <option value="deceleration">착지 감속 및 제어 불안정 (무릎/허리 통증 또는 파울 발생)</option>
+              <option value="timing">상·하체 폼 타이밍 & 신경계 폭발력(RFD) 미흡</option>
+            </select>
+          </div>
+
           <div class="form-group">
             <label for="prep-period">준비 기간</label>
             <select id="prep-period">
-              <option value="8">8주 (표준 과정)</option>
-              <option value="12">12주 (심화 과정)</option>
-              <option value="4">4주 (단기 벼락치기)</option>
+              <option value="8">8주 (표준 주기화)</option>
+              <option value="12">12주 (심화 주기화)</option>
+              <option value="4">4주 (파이널 피킹)</option>
             </select>
           </div>
 
@@ -197,43 +206,34 @@
             <label for="freq">주당 훈련 빈도</label>
             <select id="freq">
               <option value="3">주 3회 (권장)</option>
-              <option value="4">주 4회 (강도 높음)</option>
-              <option value="2">주 2회 (유지 관리)</option>
-            </select>
-          </div>
-
-          <div class="form-group full">
-            <label for="weakness">중점 보완 취약점</label>
-            <select id="weakness">
-              <option value="basic">기본 근력 & 부상 자주 발생 (건·힘줄 강화 필요)</option>
-              <option value="power">기초 힘은 좋으나 폭발적 튕김 부족 (파워/SSC 미흡)</option>
-              <option value="technique">체력은 양호하나 실기 테크닉/감속 제어 미흡</option>
+              <option value="4">주 4회 (고강도)</option>
+              <option value="2">주 2회 (유지)</option>
             </select>
           </div>
         </div>
 
-        <button type="submit" class="btn-submit">🪄 맞춤형 3단계 처방전 생성</button>
+        <button type="submit" class="btn-submit">🪄 만점 달성 4중 세션 처방전 생성</button>
       </form>
     </div>
 
-    <!-- MODE 2: PAPS 건강체력 -->
+    <!-- MODE 2: PAPS -->
     <div id="paps-mode" style="display: none;">
       <div class="hero-banner">
         <span class="badge">❤ PAPS 건강체력 증진 모드</span>
-        <h2>FITT 원리 기반 맞춤형 건강 처방</h2>
-        <p>빈도(Frequency), 강도(Intensity), 시간(Time), 형태(Type)에 근거하여 학생의 건강체력 등급 개선을 돕습니다.</p>
+        <h2>FITT-VP 원리 기반 영역별 맞춤형 건강 처방</h2>
+        <p>학생건강체력평가(PAPS) 5대 영역과 현재 등급에 맞춰 안전하고 점진적인 운동 루틴을 제공합니다.</p>
       </div>
 
-      <div class="section-title">📊 PAPS 측정 결과 및 정보 입력</div>
+      <div class="section-title">📊 PAPS 측정 영역 및 등급 입력</div>
 
       <form id="paps-form" onsubmit="generatePapsPrescription(event)">
         <div class="form-grid">
           <div class="form-group">
             <label for="paps-type">체력 측정 영역</label>
             <select id="paps-type">
-              <option value="cardio">심폐지구력 (왕복오래달리기 등)</option>
-              <option value="flexibility">유연성 (좌전굴)</option>
-              <option value="strength">근력·근지구력 (윗몸일으키기/악력)</option>
+              <option value="cardio">심폐지구력 (왕복오래달리기)</option>
+              <option value="flexibility">유연성 (앉아윗몸앞굽히기)</option>
+              <option value="strength">근력·근지구력 (윗몸말아올리기/악력)</option>
               <option value="power">순발력 (50m달리기/제멀)</option>
               <option value="bmi">비만 및 체중 관리 (BMI)</option>
             </select>
@@ -242,33 +242,28 @@
           <div class="form-group">
             <label for="paps-grade">현재 PAPS 등급</label>
             <select id="paps-grade">
-              <option value="4">4등급 (저체력 관심)</option>
-              <option value="5">5등급 (저체력 집중관리)</option>
+              <option value="4">4등급 (저체력 관심군)</option>
+              <option value="5">5등급 (저체력 집중관리군)</option>
               <option value="3">3등급 (보통 수준)</option>
             </select>
           </div>
         </div>
 
-        <button type="submit" class="btn-submit">❤ PAPS FITT 처방전 생성</button>
+        <button type="submit" class="btn-submit">❤ PAPS 맞춤형 FITT 처방전 생성</button>
       </form>
     </div>
 
-    <!-- PRESCRIPTION RESULT SECTION -->
+    <!-- RESULT SECTION -->
     <div id="result-section" class="result-container">
-      <div class="section-title" style="margin-top:20px;">📋 맞춤형 피지컬 운동 처방전</div>
+      <div class="section-title" style="margin-top:20px;">📋 만점 전략 맞춤 피지컬 처방전</div>
       
-      <div class="summary-card" id="summary-box">
-        <!-- Dynamic Summary -->
-      </div>
+      <div class="summary-card" id="summary-box"></div>
+      <div class="strategy-box" id="strategy-box"></div>
+      <div id="phase-container"></div>
 
-      <div id="phase-container">
-        <!-- Dynamic Phases -->
-      </div>
-
-      <!-- Utilities -->
       <div class="utility-bar">
         <button class="btn-secondary" onclick="copyPrescription()">📋 처방전 복사</button>
-        <button class="btn-secondary" onclick="window.print()">🤾‍♂️ PDF / 인쇄 저장</button>
+        <button class="btn-secondary" onclick="window.print()">🖨️ PDF / 인쇄 저장</button>
         <button class="btn-secondary" onclick="toggleTimer()">⏱ 세트 휴식 타이머</button>
       </div>
 
@@ -280,7 +275,7 @@
           <button class="timer-btn" onclick="startTimer(60)">60초</button>
           <button class="timer-btn" onclick="startTimer(90)">90초</button>
           <button class="timer-btn" onclick="startTimer(120)">120초</button>
-          <button class="timer-btn" style="background:#ef4444;" onclick="stopTimer()">정지</button>
+          <button class="timer-btn" style="background:#ef4444; border:none;" onclick="stopTimer()">정지</button>
         </div>
       </div>
     </div>
@@ -291,209 +286,22 @@
 <script>
   let timerInterval = null;
 
-  function switchMode(mode) {
-    const tabs = document.querySelectorAll('.tab-btn');
-    const entranceMode = document.getElementById('entrance-mode');
-    const papsMode = document.getElementById('paps-mode');
-    const resultSec = document.getElementById('result-section');
-
-    resultSec.classList.remove('active');
-
-    if (mode === 'entrance') {
-      tabs[0].classList.add('active');
-      tabs[1].classList.remove('active');
-      entranceMode.style.display = 'block';
-      papsMode.style.display = 'none';
-    } else {
-      tabs[1].classList.add('active');
-      tabs[0].classList.remove('active');
-      entranceMode.style.display = 'none';
-      papsMode.style.display = 'block';
-    }
-  }
-
-  function updateSportUnit() {
-    const select = document.getElementById('sport-select');
-    const selectedOpt = select.options[select.selectedIndex];
-    const unit = selectedOpt.getAttribute('data-unit');
-
-    document.getElementById('curr-unit').textContent = unit;
-    document.getElementById('target-unit').textContent = unit;
-  }
-
-  function generateEntrancePrescription(e) {
-    e.preventDefault();
-    const select = document.getElementById('sport-select');
-    const sportName = select.options[select.selectedIndex].text;
-    const dir = select.options[select.selectedIndex].getAttribute('data-dir');
-    const unit = select.options[select.selectedIndex].getAttribute('data-unit');
-
-    const curr = parseFloat(document.getElementById('curr-record').value);
-    const target = parseFloat(document.getElementById('target-record').value);
-    const weeks = parseInt(document.getElementById('prep-period').value);
-    const freq = document.getElementById('freq').value;
-
-    let gap = dir === 'max' ? (target - curr) : (curr - target);
-    gap = Math.round(gap * 10) / 10;
-
-    const summaryBox = document.getElementById('summary-box');
-    summaryBox.innerHTML = `
-      <div class="summary-item"><div class="label">선택 종목</div><div class="val" style="font-size:16px;">${sportName}</div></div>
-      <div class="summary-item"><div class="label">목표 격차(GAP)</div><div class="val">${gap > 0 ? '+' : ''}${gap} ${unit}</div></div>
-      <div class="summary-item"><div class="label">총 훈련 기간</div><div class="val">${weeks}주 (주 ${freq}회)</div></div>
-    `;
-
-    // Calculate periodization weeks
-    let p1Weeks = Math.round(weeks * 0.3);
-    let p2Weeks = Math.round(weeks * 0.4);
-    let p3Weeks = weeks - p1Weeks - p2Weeks;
-
-    const phaseContainer = document.getElementById('phase-container');
-    phaseContainer.innerHTML = `
-      <!-- Phase 1 -->
-      <div class="phase-card">
-        <div class="phase-header">
-          <span class="phase-title">1단계: 건·힘줄 적응 및 결합조직 강화</span>
-          <span class="phase-period">1 ~ ${p1Weeks}주차 (RIR 3 / 안전 중심)</span>
-        </div>
-        <ul class="exercise-list">
-          <li class="exercise-item">
-            <div><span class="ex-info">등척성 카프레이즈 & 스쿼트 홀드</span><div class="ex-detail">정지 상태에서 힘줄 인장 강도 확보 (45초 버티기)</div></div>
-            <div>4세트 / 휴식 60초</div>
-          </li>
-          <li class="exercise-item">
-            <div><span class="ex-info">3초 신장성(Eccentric) 맨몸/가벼운 저항 훈련</span><div class="ex-detail">3초간 천천히 내려가며 관절 제어력 확보</div></div>
-            <div>10회 x 3세트</div>
-          </li>
-          <li class="exercise-item">
-            <div><span class="ex-info">Low-Impact 라인 점프</span><div class="ex-detail">발목 탄력 형성 및 아킬레스건 워밍업</div></div>
-            <div>30초 x 4세트</div>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Phase 2 -->
-      <div class="phase-card">
-        <div class="phase-header">
-          <span class="phase-title">2단계: 최대 근력 & 기저 출력 강화</span>
-          <span class="phase-period">${p1Weeks + 1} ~ ${p1Weeks + p2Weeks}주차 (RIR 2 / 저항 과부하)</span>
-        </div>
-        <ul class="exercise-list">
-          <li class="exercise-item">
-            <div><span class="ex-info">백스쿼트 / 불가리안 스플릿 스쿼트</span><div class="ex-detail">하체 근육 신경계 동원율 및 출력 증가</div></div>
-            <div>8회 x 4세트</div>
-          </li>
-          <li class="exercise-item">
-            <div><span class="ex-info">Medium-Impact 턱 점프 (Tuck Jump)</span><div class="ex-detail">무릎을 가슴으로 끌어올리며 지면반발력 수용</div></div>
-            <div>6회 x 4세트 / 휴식 90초</div>
-          </li>
-          <li class="exercise-item">
-            <div><span class="ex-info">코어 플랭크 & 안티 로테이션</span><div class="ex-detail">힘 전달 손실을 막기 위한 골반/척추 고정 훈련</div></div>
-            <div>60초 x 3세트</div>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Phase 3 -->
-      <div class="phase-card">
-        <div class="phase-header">
-          <span class="phase-title">3단계: 순발력, RFD 폭발력 & SSC 특화</span>
-          <span class="phase-period">${p1Weeks + p2Weeks + 1} ~ ${weeks}주차 (RIR 0~1 / 최대속도 수행)</span>
-        </div>
-        <ul class="exercise-list">
-          <li class="exercise-item">
-            <div><span class="ex-info">뎁스 점프 (Depth Jump, 30cm 박스)</span><div class="ex-detail">지면에 닿자마자 0.2초 이내 폭발적 재점프 (신장-단축 주기 극대화)</div></div>
-            <div>5회 x 4세트 / 휴식 120초</div>
-          </li>
-          <li class="exercise-item">
-            <div><span class="ex-info">싱글레그 바운딩 & 실기 오버스피드</span><div class="ex-detail">실기 측정 폼으로 최고 속도 수축 주입</div></div>
-            <div>15m x 3세트</div>
-          </li>
-        </ul>
-      </div>
-    `;
-
-    document.getElementById('result-section').classList.add('active');
-  }
-
-  function generatePapsPrescription(e) {
-    e.preventDefault();
-    const type = document.getElementById('paps-type').value;
-    const grade = document.getElementById('paps-grade').value;
-
-    const summaryBox = document.getElementById('summary-box');
-    summaryBox.innerHTML = `
-      <div class="summary-item"><div class="label">PAPS 영역</div><div class="val" style="font-size:16px;">${type.toUpperCase()}</div></div>
-      <div class="summary-item"><div class="label">현재 상태</div><div class="val">${grade}등급 (개선 필요)</div></div>
-      <div class="summary-item"><div class="label">목표</div><div class="val">3등급 이상 진입</div></div>
-    `;
-
-    const phaseContainer = document.getElementById('phase-container');
-    phaseContainer.innerHTML = `
-      <div class="phase-card">
-        <div class="phase-header">
-          <span class="phase-title">FITT 처방 가이드라인</span>
-          <span class="phase-period">주 3~4회 / RPE 12~14 (약간 힘들다)</span>
-        </div>
-        <ul class="exercise-list">
-          <li class="exercise-item">
-            <div><span class="ex-info">Frequency (빈도)</span><div class="ex-detail">주당 3 ~ 4회 일정하게 수행</div></div>
-            <div>주 3-4일</div>
-          </li>
-          <li class="exercise-item">
-            <div><span class="ex-info">Intensity (강도)</span><div class="ex-detail">최대 심박수의 60~75% 또는 숨이 차서 대화가 약간 힘든 정도</div></div>
-            <div>중강도</div>
-          </li>
-          <li class="exercise-item">
-            <div><span class="ex-info">Time (시간) & Type (형태)</span><div class="ex-detail">1회당 30~40분 / 유산소 조깅, 인터벌 및 맨몸 전신 운동</div></div>
-            <div>30~40분</div>
-          </li>
-        </ul>
-      </div>
-    `;
-
-    document.getElementById('result-section').classList.add('active');
-  }
-
-  function toggleTimer() {
-    const timerBox = document.getElementById('timer-box');
-    timerBox.style.display = timerBox.style.display === 'none' ? 'block' : 'none';
-  }
-
-  function startTimer(seconds) {
-    clearInterval(timerInterval);
-    let timeLeft = seconds;
-    const display = document.getElementById('timer-val');
-
-    function updateDisplay() {
-      const m = String(Math.floor(timeLeft / 60)).padStart(2, '0');
-      const s = String(timeLeft % 60).padStart(2, '0');
-      display.textContent = `${m}:${s}`;
-    }
-
-    updateDisplay();
-    timerInterval = setInterval(() => {
-      timeLeft--;
-      if (timeLeft < 0) {
-        clearInterval(timerInterval);
-        display.textContent = "휴식 끝! 다음 세트!";
-      } else {
-        updateDisplay();
-      }
-    }, 1000);
-  }
-
-  function stopTimer() {
-    clearInterval(timerInterval);
-    document.getElementById('timer-val').textContent = "00:00";
-  }
-
-  function copyPrescription() {
-    const text = document.getElementById('phase-container').innerText;
-    navigator.clipboard.writeText(text).then(() => {
-      alert("처방전 내용이 클립보드에 복사되었습니다!");
-    });
-  }
-</script>
-</body>
-</html>
+  // 확장된 종목별 세부 데이터베이스 (세션당 4종목 + 대체 훈련 표기)
+  const expandedEntranceDB = {
+    lower_power: {
+      name: "하지 순발력 & 점프 파워",
+      p1: {
+        title: "1단계: 결합조직 인장 강도 & 힙힌지 기초",
+        meta: "RIR 3 / 적응기",
+        items: [
+          { role: "주동근", cls: "role-main", name: "등척성 카프레이즈 & 1/4 스쿼트 홀드", desc: "아킬레스건 및 슬개건 탄성 강성 구축", dose: "45초 버티기 × 4세트", alt: "대체: 싱글레그 밴드 이소메트릭 홀드" },
+          { role: "보조근", cls: "role-sub", name: "3초 신장성(Eccentric) 스쿼트", desc: "하체 감속 제어 및 고관절 힌지 자세 숙달", dose: "10회 × 3세트", alt: "대체: 덤벨 고블렛 스쿼트" },
+          { role: "전이", cls: "role-transfer", name: "발목 포고 점프 (Pogo Hops)", desc: "지면 접촉 시간을 줄이는 발목 탄성", dose: "20회 × 4세트", alt: "대체: 라인 홉 (Line Hops)" },
+          { role: "코어", cls: "role-core", name: "할로우 바디 & 글루트 브릿지", desc: "공중 및 착지 시 척추 고정력 확보", dose: "40초 × 3세트", alt: "대체: 안티-로테이션 플랭크" }
+        ]
+      },
+      p2: {
+        title: "2단계: 하체 최대 근력 & 수직/수평 출력",
+        meta: "RIR 2 / 저항과부하",
+        items: [
+          { role: "주동근", cls: "role-main", name: "백스쿼트 (또는 트랩바 데드리프트)", desc: "하체 신경계 동원율 및 근력 극대화", dose: "6~8회 × 4세트", alt: "대체: 불가
